@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Bài Làm - Học Sinh</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg: #cbd5e1; --border: #000000; --text: #000000; --success: #10b981; --danger: #e11d48;}
+        html { scroll-behavior: smooth; }
+        
+        /* Đã sửa lỗi line-height từ 0.75 lên 1.3 để chữ không bị đè lên nhau */
+        body { font-family: 'Times New Roman', Times, serif; background: var(--bg); margin: 0; padding: 20px; color: var(--text); line-height: 1.3; display: flex; flex-direction: column; align-items: center;}
+        .hidden { display: none !important; }
+        
+        /* THANH CÔNG CỤ */
+        .action-bar { margin-bottom: 15px; text-align: center; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; font-family: 'Segoe UI', Tahoma, sans-serif;}
+        .btn { padding: 10px 18px; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;}
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* KHUNG GIẤY A4 */
+        #report-content { background: white; width: 794px; min-height: 1122px; padding: 12mm 15mm 12mm 20mm; box-shadow: 0 10px 25px rgba(0,0,0,0.2); margin: 0 auto; position: relative; }
+        
+        /* HEADER */
+        .header-top { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 12pt; font-weight: bold; }
+        .header-top p { margin: 3px 0; } 
+        .header-left { width: 45%; text-align: left; }
+        .header-right { width: 50%; text-align: center; }
+        
+        .student-info { font-size: 13pt; margin-bottom: 15px; margin-top: 15px; }
+        .student-info p { margin: 5px 0; } 
+        .dynamic-data { font-weight: bold; padding: 0 5px; }
+        
+        .report-title { text-align: center; margin: 20px 0; }
+        .report-title h1 { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin: 0; }
+
+        /* BẢNG ĐIỂM */
+        .score-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 25px; }
+        .score-table th, .score-table td { border: 1px solid var(--border); padding: 10px; text-align: center; font-size: 13pt; }
+        .score-table th { font-weight: bold; }
+        .score-val { font-size: 14pt; font-weight: bold; color: var(--danger); }
+        .score-essay { font-size: 14pt; font-weight: bold; color: #64748b; }
+
+        /* TIÊU ĐỀ PHẦN */
+        .section-title { font-size: 13pt; font-weight: bold; margin: 20px 0 10px 0; text-transform: uppercase; }
+
+        /* BẢNG DỮ LIỆU CHUNG */
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; } 
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 8px 5px; text-align: center; font-size: 12pt; word-break: break-word; }
+        .data-table th { font-weight: bold; background: #f8fafc; }
+
+        /* TỰ LUẬN */
+        #box-essay { font-size: 13pt; text-align: justify; }
+        .essay-item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc; }
+        .essay-item img { max-width: 100%; height: auto; border: 1px solid #ccc; margin-top: 10px; }
+        .avoid-break { page-break-inside: avoid !important; }
+
+        /* ĐỊNH DẠNG XUẤT PDF */
+        body.is-exporting { align-items: flex-start !important; padding: 0 !important; background: white !important; }
+        body.is-exporting .action-bar { display: none !important; }
+        body.is-exporting #report-content { margin: 0 !important; box-shadow: none !important; position: absolute; top: 0; left: 0; }
+        @media print { .action-bar { display: none; } #report-content { box-shadow: none; width: 100%; padding: 0; } }
+    </style>
+</head>
+<body>
+
+<div class="action-bar">
+    <button class="btn" style="background: #f59e0b;" onclick="redoExam()"><i class="fa-solid fa-rotate-left"></i> Làm lại bài thi</button>
+    <button class="btn" id="btn-download" style="background: var(--primary);" onclick="exportPDF()"><i class="fa-solid fa-file-pdf"></i> Tải Phiếu PDF</button>
+    <button class="btn" style="background: #ef4444;" onclick="goHome()"><i class="fa-solid fa-house"></i> Về Trang chủ</button>
+</div>
+
+<div id="report-content">
+    <div class="header-top">
+        <div class="header-left">
+            <p>TRƯỜNG <span id="lbl-school">---</span></p>
+            <p>Tổ: Khoa học tự nhiên</p>
+        </div>
+        <div class="header-right">
+            <p>ĐỀ TỰ LUYỆN CUỐI KỲ II</p>
+            <p>Năm học: <span id="lbl-year">2025 - 2026</span></p>
+            <p>Môn: <span id="lbl-subject">Tin học</span></p>
+        </div>
+    </div>
+
+    <div class="student-info">
+        <p>Họ và tên thí sinh: <span id="lbl-name" class="dynamic-data"></span></p>
+        <p>Lớp: <span id="lbl-class" class="dynamic-data"></span></p>
+        <p>Thời gian làm bài: <span id="lbl-time" class="dynamic-data"></span></p>
+    </div>
+
+    <div class="report-title"><h1>PHIẾU BÀI LÀM CHI TIẾT</h1></div>
+
+    <table class="score-table">
+        <tr>
+            <th>Điểm Trắc nghiệm</th>
+            <th>Điểm Tự luận</th>
+            <th>Tổng điểm</th>
+        </tr>
+        <tr>
+            <td class="score-val" id="lbl-score-tn">0.00</td>
+            <td class="score-essay" id="lbl-score-tl"><i style="font-size: 12pt; font-weight: normal;">(Chưa chấm)</i></td>
+            <td class="score-val" id="lbl-score-total">0.00</td>
+        </tr>
+    </table>
+
+    <div class="avoid-break">
+        <p class="section-title">I. PHẦN TRẮC NGHIỆM LỰA CHỌN</p>
+        <table id="tbl-mcq" class="data-table">
+            </table>
+    </div>
+
+    <div class="avoid-break" style="margin-top: 15px;">
+        <p class="section-title">II. PHẦN TRẮC NGHIỆM ĐÚNG/SAI</p>
+        <table id="tbl-tf" class="data-table">
+            <thead>
+                <tr>
+                    <th>Câu</th>
+                    <th>Ý a</th>
+                    <th>Ý b</th>
+                    <th>Ý c</th>
+                    <th>Ý d</th>
+                </tr>
+            </thead>
+            <tbody id="tfBody">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="section-essay" style="margin-top: 15px; display: block;">
+        <p class="section-title">III. PHẦN TỰ LUẬN</p>
+        <div id="box-essay">
+            </div>
+    </div>
+</div>
+
+<script>
+    function initReport() {
+        // 1. ĐIỀN THÔNG TIN HÀNH CHÍNH
+        document.getElementById('lbl-name').innerText = (sessionStorage.getItem('exam_name') || "Chưa cập nhật").toUpperCase();
+        document.getElementById('lbl-school').innerText = (sessionStorage.getItem('exam_school') || "---").toUpperCase();
+        document.getElementById('lbl-class').innerText = sessionStorage.getItem('exam_class') || "---";
+        document.getElementById('lbl-subject').innerText = sessionStorage.getItem('report_subject') || "Tin học";
+        document.getElementById('lbl-time').innerText = sessionStorage.getItem('report_time') || "---";
+        
+        let scoreTN = parseFloat(sessionStorage.getItem('report_score_tn')) || 0.0;
+        document.getElementById('lbl-score-tn').innerText = scoreTN.toFixed(2);
+        document.getElementById('lbl-score-total').innerText = scoreTN.toFixed(2);
+
+        // ==============================================================
+        // 2. XỬ LÝ BẢNG TRẮC NGHIỆM LỰA CHỌN (CHUẨN 1 DÒNG 12 CÂU)
+        // ==============================================================
+        let rawMcq = sessionStorage.getItem('report_mcq') || "";
+        let trQ = "<tr>";
+        let trA = "<tr>";
+
+        for (let i = 1; i <= 12; i++) {
+            trQ += `<th>C.${i}</th>`;
+        }
+        trQ += "</tr>";
+
+        let answers = [];
+        if (rawMcq && rawMcq.includes('<td')) {
+            let tempTable = document.createElement('table');
+            tempTable.innerHTML = rawMcq;
+            let tds = tempTable.querySelectorAll('td');
+            tds.forEach(td => answers.push(td.textContent.trim()));
+        }
+
+        for (let i = 0; i < 12; i++) {
+            let ansText = answers[i] ? answers[i] : "";
+            trA += `<td><b style="color:var(--primary); font-size:14pt;">${ansText}</b></td>`;
+        }
+        trA += "</tr>";
+        document.getElementById('tbl-mcq').innerHTML = trQ + trA;
+
+        // ==============================================================
+        // 3. XỬ LÝ BẢNG TRẮC NGHIỆM ĐÚNG/SAI CHUẨN FORM
+        // ==============================================================
+        let rawTf = sessionStorage.getItem('report_tf') || "";
+        if (rawTf && rawTf.includes('<td')) {
+            let tempTable = document.createElement('table');
+            tempTable.innerHTML = rawTf;
+            
+            let rows = tempTable.querySelectorAll('tr');
+            let finalTfBody = "";
+            
+            rows.forEach(row => {
+                if (!row.querySelector('th')) {
+                    finalTfBody += "<tr>";
+                    let tds = row.querySelectorAll('td');
+                    
+                    tds.forEach((td, index) => {
+                        let text = td.textContent.trim();
+                        if (index === 0) {
+                            finalTfBody += `<td><b>${text}</b></td>`;
+                        } else {
+                            if (text === 'Đ' || text === 'S' || text === 'D') {
+                                let displayChar = (text === 'D') ? 'Đ' : text; 
+                                finalTfBody += `<td><b style="color:var(--primary); font-size:14pt;">${displayChar}</b></td>`;
+                            } else {
+                                finalTfBody += `<td></td>`;
+                            }
+                        }
+                    });
+                    finalTfBody += "</tr>";
+                }
+            });
+            
+            document.getElementById('tfBody').innerHTML = finalTfBody;
+        } else {
+            document.getElementById('tfBody').innerHTML = "<tr><td colspan='5'>Không có dữ liệu</td></tr>";
+        }
+
+        // ==============================================================
+        // 4. XỬ LÝ PHẦN TỰ LUẬN (GIỮ NGUYÊN ĐỊNH DẠNG MÀU, ẢNH TỪ HỌC SINH)
+        // ==============================================================
+        // Dán trực tiếp khối HTML Tự Luận sinh ra từ các form thi mới
+        let reportEssay = sessionStorage.getItem('report_essay') || "<i>Học sinh không nhập dữ liệu tự luận.</i>";
+        document.getElementById('box-essay').innerHTML = reportEssay;
+    }
+
+    // ==============================================================
+    // 5. CÁC NÚT ĐIỀU HƯỚNG & XUẤT PDF
+    // ==============================================================
+    async function exportPDF() {
+        const btn = document.getElementById('btn-download');
+        const element = document.getElementById('report-content');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+        btn.disabled = true;
+        
+        window.scrollTo(0, 0); 
+        document.body.classList.add('is-exporting');
+
+        const opt = {
+            margin: 0, 
+            filename: `Phieu_Ket_Qua_${sessionStorage.getItem('exam_name') || 'HocSinh'}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0, windowWidth: 794 }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        setTimeout(() => {
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.classList.remove('is-exporting');
+                btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Tải Phiếu PDF';
+                btn.disabled = false;
+            }).catch(err => { 
+                console.error(err);
+                document.body.classList.remove('is-exporting'); 
+                btn.disabled = false; 
+            });
+        }, 600);
+    }
+
+    function redoExam() {
+        const sub = sessionStorage.getItem('report_subject') || "";
+        let grade = sub.includes("6") ? "6" : sub.includes("7") ? "7" : sub.includes("8") ? "8" : "9";
+        window.location.href = "tin" + grade + ".html";
+    }
+
+    // Đã loại bỏ phần popup confirm()
+    function goHome() {
+        sessionStorage.clear(); 
+        window.location.href = "index.html"; 
+    }
+
+    // Khởi chạy hàm khi load trang
+    window.onload = initReport;
+</script>
+</body>
+</html>

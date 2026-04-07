@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề ôn tự luyện - Tin học 7</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="config.js"></script>
+
+    <style>
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg-color: #f1f5f9; --surface: #ffffff; --text-main: #0f172a; --border: #cbd5e1; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
+
+        .exam-layout { max-width: 1200px; margin: 0 auto; display: flex; gap: 25px; align-items: flex-start; }
+        .exam-main { flex: 1; min-width: 0; }
+        .exam-sidebar { width: 320px; flex-shrink: 0; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; z-index: 100; }
+
+        /* GIAO DIỆN HEADER MỚI (CHUẨN GIẤY THI) */
+        .classic-header { background: white; border: 1px solid var(--border); margin-bottom: 25px; font-family: 'Times New Roman', Times, serif; color: #000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .classic-header-top { display: flex; flex-wrap: wrap; }
+        .classic-left { flex: 1.3; min-width: 300px; padding: 20px 25px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 18px; }
+        .classic-right { flex: 1; min-width: 250px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+        .classic-header-bottom { border-top: 1px solid var(--border); padding: 12px; text-align: center; font-style: italic; color: #475569; font-size: 16px; }
+        .info-line { display: flex; align-items: flex-end; gap: 8px; white-space: nowrap; font-size: 18px; font-weight: bold; }
+        .dotted-line { border-bottom: 2px dotted #000; flex: 1; color: var(--primary); font-weight: bold; padding: 0 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; font-size: 18px;}
+        .line-short { flex: 0.3; min-width: 60px; }
+        .exam-title { font-weight: bold; font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .exam-subject { font-weight: bold; font-size: 18px; text-transform: uppercase; }
+
+        .section-title { font-size: 16px; font-weight: bold; color: var(--surface); background: var(--primary); padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; }
+
+        .question-card { background: var(--surface); padding: 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid var(--border); transition: 0.2s ease; scroll-margin-top: 20px; }
+        .question-card:hover { border-color: #93c5fd; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .question-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; line-height: 1.5; white-space: pre-wrap;}
+        .question-text span { color: var(--primary); }
+
+        .mcq-options { display: grid; gap: 10px; }
+        .grid-1 { grid-template-columns: 1fr; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+        .mcq-option { display: flex; align-items: center; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.2s; background: #f8fafc; height: 100%; box-sizing: border-box; font-size: 15px;}
+        .mcq-option:hover { background: #eff6ff; border-color: #bfdbfe; }
+        .mcq-option input[type="radio"] { margin-right: 12px; transform: scale(1.2); cursor: pointer; flex-shrink: 0; }
+
+        .tf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .tf-table th, .tf-table td { border: 1px solid var(--border); padding: 12px; text-align: center; }
+        .tf-table th { background: #f1f5f9; font-weight: 600; }
+        .tf-table .tf-text { text-align: left; font-size: 15px; }
+        .tf-radio { transform: scale(1.3); cursor: pointer; }
+        
+        .rte-container { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .rte-toolbar { background: #f1f5f9; padding: 8px; border-bottom: 1px solid var(--border); display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+        .rte-btn { background: white; border: 1px solid var(--border); padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--text-main); font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;}
+        .rte-btn:hover { background: #e2e8f0; border-color: #94a3b8; color: var(--primary); }
+        .rte-btn select, .rte-btn input[type="color"] { border: none; background: transparent; cursor: pointer; outline: none; }
+        .rte-btn input[type="file"] { display: none; }
+        
+        .essay-box { width: 100%; min-height: 200px; padding: 15px; font-size: 15px; font-family: inherit; outline: none; box-sizing: border-box; background: white; overflow-y: auto; line-height: 1.6; }
+        .essay-box:focus { background: #fafafa; }
+        .essay-box img { max-width: 100%; height: auto; border-radius: 4px; margin: 5px 0; border: 1px solid #e2e8f0;}
+
+        .sidebar-box { background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .timer-title { text-align: center; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 8px;}
+        .timer-display { background: #eff6ff; color: var(--danger); padding: 15px; border-radius: 8px; font-size: 32px; font-weight: bold; text-align: center; border: 2px solid #bfdbfe; font-family: monospace; letter-spacing: 2px; }
+        .palette-title { font-size: 14px; font-weight: bold; margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 10px; }
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; }
+        .palette-btn { aspect-ratio: 1; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; font-weight: 600; font-size: 14px; color: var(--text-main); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; padding: 0; }
+        .palette-btn:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff;}
+        .palette-btn.answered { background: var(--primary); color: white; border-color: var(--primary); }
+        .palette-legend { display: flex; justify-content: space-between; font-size: 12px; color: #64748b; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .box-color { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--border); }
+        .box-color.done { background: var(--primary); border-color: var(--primary); }
+        .box-color.not-done { background: white; }
+
+        .btn-submit { width: 100%; background: var(--success); color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); text-transform: uppercase; }
+        .btn-submit:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* GIAO DIỆN MODAL THAY THẾ ALERT/CONFIRM */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(3px); }
+        .modal-content { background: white; width: 400px; max-width: 90%; border-radius: 12px; overflow: hidden; animation: slideDown 0.3s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.2); text-align: center; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-body { padding: 30px 20px 20px; }
+        .modal-body i { font-size: 55px; color: var(--primary); margin-bottom: 15px; }
+        .modal-body h3 { margin: 0 0 10px; color: var(--text-main); font-size: 20px; text-transform: uppercase;}
+        .modal-body p { margin: 0; color: #475569; font-size: 15px; line-height: 1.5; }
+        .modal-footer { padding: 15px 20px; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 10px; }
+        .btn-cancel { padding: 10px 20px; border: none; background: #94a3b8; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 14px;}
+        .btn-cancel:hover { background: #64748b; }
+        .btn-confirm { padding: 10px 20px; border: none; background: var(--primary); color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 14px;}
+        .btn-confirm:hover { background: var(--primary-hover); }
+
+        /* TOAST NOTIFICATION */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { min-width: 250px; background: white; color: var(--text-main); padding: 15px 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px; animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; border-left: 4px solid var(--primary); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        .toast i { font-size: 20px; }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        .toast.warning i { color: var(--warning); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        @media (max-width: 992px) {
+            .exam-layout { flex-direction: column; }
+            .exam-sidebar { width: 100%; position: static; order: -1; }
+            .palette-grid { grid-template-columns: repeat(10, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .classic-left { border-right: none; border-bottom: 1px solid var(--border); }
+            .info-line { flex-wrap: wrap; }
+            .line-short { flex: 1; }
+            .palette-grid { grid-template-columns: repeat(7, 1fr); }
+            .grid-2 { grid-template-columns: 1fr; }
+            .tf-table th:nth-child(2), .tf-table th:nth-child(3) { width: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="exam-layout">
+    <div class="exam-main">
+        
+        <div class="classic-header">
+            <div class="classic-header-top">
+                <div class="classic-left">
+                    <div class="info-line">
+                        TRƯỜNG <span class="dotted-line" id="display-school">---</span>
+                    </div>
+                    <div class="info-line">
+                        Họ và tên: <span class="dotted-line" id="display-name">---</span>
+                        Lớp <span class="dotted-line line-short" id="display-class">---</span>
+                    </div>
+                </div>
+                <div class="classic-right">
+                    <div class="exam-title">ĐỀ ÔN TẬP TỰ LUYỆN</div>
+                    <div class="exam-subject">MÔN: <span style="color: var(--primary);">TIN HỌC 7</span></div>
+                </div>
+            </div>
+            <div class="classic-header-bottom">
+                Thời gian làm bài: 45 phút (không kể thời gian giao đề)
+            </div>
+        </div>
+
+        <div id="quiz-container"></div>
+    </div>
+
+    <div class="exam-sidebar">
+        <div class="sidebar-box">
+            <div class="timer-title">Thời gian làm bài</div>
+            <div class="timer-display" id="timer">45:00</div>
+        </div>
+
+        <div class="sidebar-box">
+            <div class="palette-title"><i class="fa-solid fa-table-cells-large"></i> BẢNG CÂU HỎI</div>
+            <div class="palette-grid" id="palette-container"></div>
+            <div class="palette-legend">
+                <div class="legend-item"><div class="box-color done"></div> Đã làm</div>
+                <div class="legend-item"><div class="box-color not-done"></div> Chưa làm</div>
+            </div>
+        </div>
+
+        <button class="btn-submit" id="btn-submit" onclick="openSubmitModal()"><i class="fa-solid fa-paper-plane"></i> Nộp bài thi</button>
+    </div>
+</div>
+
+<div id="submitModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-body">
+            <i class="fa-solid fa-circle-question"></i>
+            <h3>Xác nhận nộp bài</h3>
+            <p id="submit-msg">Bạn có chắc chắn muốn nộp bài thi?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeSubmitModal()">Quay lại làm tiếp</button>
+            <button class="btn-confirm" onclick="executeSubmit()"><i class="fa-solid fa-paper-plane"></i> Nộp bài ngay</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // 1. NGÂN HÀNG CÂU HỎI (TIN HỌC 7)
+    // ==========================================
+    
+    const allMcqBank = [
+        // BÀI 11: TẠO BÀI TRÌNH CHIẾU
+        { lesson: 11, lvl: "NB", q: "Chức năng cơ bản nhất của phần mềm trình chiếu là gì?", options: ["Tạo các trang chiếu chứa nội dung văn bản, hình ảnh, âm thanh...", "Tính toán và lập bảng thống kê tự động", "Chỉnh sửa video chuyên nghiệp", "Quản lý cơ sở dữ liệu"], correct: 0, cols: 1 },
+        { lesson: 11, lvl: "NB", q: "Trong một bài trình chiếu, trang đầu tiên thường được gọi là gì?", options: ["Trang nội dung", "Trang tiêu đề", "Trang kết luận", "Trang tóm tắt"], correct: 1, cols: 2 },
+        { lesson: 11, lvl: "NB", q: "Mỗi trang nội dung thường bắt đầu bằng thành phần nào?", options: ["Hình ảnh minh họa", "Nội dung chi tiết", "Tiêu đề trang", "Bảng biểu"], correct: 2, cols: 2 },
+        { lesson: 11, lvl: "NB", q: "Cấu trúc phân cấp trong bài trình chiếu thường được thể hiện bằng cách nào?", options: ["Đổi màu chữ liên tục", "Sử dụng các dấu đầu dòng (Bullet) với mức lề khác nhau", "Sử dụng hiệu ứng âm thanh", "Chèn thật nhiều hình ảnh"], correct: 1, cols: 1 },
+        { lesson: 11, lvl: "NB", q: "Phần mềm nào sau đây là phần mềm trình chiếu phổ biến?", options: ["Microsoft Excel", "Microsoft Word", "Microsoft PowerPoint", "Microsoft Paint"], correct: 2, cols: 2 },
+        { lesson: 11, lvl: "NB", q: "Trang tiêu đề thường chứa thông tin gì?", options: ["Tên chủ đề bài trình chiếu và tên tác giả", "Toàn bộ nội dung bài học", "Lời cảm ơn khán giả", "Bảng thống kê số liệu"], correct: 0, cols: 1 },
+        { lesson: 11, lvl: "NB", q: "Mẫu bố trí (Layout) trang chiếu dùng để làm gì?", options: ["Xóa trang chiếu", "Định dạng sẵn vị trí của tiêu đề, văn bản, hình ảnh trên trang", "Tạo hiệu ứng chuyển động", "Lưu tệp trình chiếu"], correct: 1, cols: 1 },
+        { lesson: 11, lvl: "NB", q: "Phím tắt dùng để tạo một trang trình chiếu mới là gì?", options: ["Ctrl + N", "Ctrl + M", "Ctrl + S", "Ctrl + C"], correct: 1, cols: 2 },
+        { lesson: 11, lvl: "NB", q: "Để thay đổi mẫu bố trí cho một trang chiếu đã có, ta chọn lệnh nào?", options: ["Home > Layout", "Insert > New Slide", "Design > Themes", "Transitions"], correct: 0, cols: 2 },
+        { lesson: 11, lvl: "NB", q: "Mục đích chính của việc dùng cấu trúc phân cấp là gì?", options: ["Làm cho chữ to hơn", "Trình bày thông tin mạch lạc, rõ ràng, dễ hiểu", "Thêm hiệu ứng đẹp mắt", "Tự động dịch ngôn ngữ"], correct: 1, cols: 1 },
+        { lesson: 11, lvl: "NB", q: "Để xem trước bài trình chiếu từ trang đầu tiên, ta nhấn phím gì?", options: ["F5", "Shift + F5", "Esc", "Enter"], correct: 0, cols: 2 },
+        { lesson: 11, lvl: "NB", q: "Trong cấu trúc phân cấp, thao tác nhấn phím Tab ở đầu dòng sẽ làm gì?", options: ["Tăng mức phân cấp (lùi vào trong)", "Giảm mức phân cấp (đưa ra ngoài)", "Xóa dòng đó", "Tạo trang mới"], correct: 0, cols: 1 },
+
+        // BÀI 12: ĐỊNH DẠNG ĐỐI TƯỢNG TRÊN TRANG CHIẾU
+        { lesson: 12, lvl: "NB", q: "Để chèn hình ảnh vào trang chiếu, ta sử dụng dải lệnh nào?", options: ["Home", "Insert", "Design", "Transitions"], correct: 1, cols: 2 },
+        { lesson: 12, lvl: "NB", q: "Có thể sao chép văn bản từ phần mềm MS Word sang MS PowerPoint được không?", options: ["Có, nhưng chỉ sao chép được một dòng", "Hoàn toàn có thể", "Không thể sao chép được", "Chỉ sao chép được chữ cái, không sao chép được số"], correct: 1, cols: 1 },
+        { lesson: 12, lvl: "NB", q: "Thao tác nào dùng để thay đổi kích thước hình ảnh trên trang chiếu?", options: ["Kéo thả các nút tròn ở góc hoặc cạnh của hình ảnh", "Nhấn đúp chuột vào hình ảnh", "Nhấn phím Delete", "Nhấn phím Space"], correct: 0, cols: 1 },
+        { lesson: 12, lvl: "NB", q: "Nhóm lệnh Font trên dải lệnh Home dùng để làm gì?", options: ["Chèn hình ảnh", "Định dạng văn bản (phông, cỡ, màu chữ...)", "Tạo hiệu ứng động", "Chọn mẫu bố trí"], correct: 1, cols: 1 },
+        { lesson: 12, lvl: "NB", q: "Công cụ Theme (mẫu định dạng) nằm ở dải lệnh nào?", options: ["Insert", "Design", "Animations", "View"], correct: 1, cols: 2 },
+        { lesson: 12, lvl: "NB", q: "Mẫu định dạng (Theme) cung cấp sẵn những yếu tố nào?", options: ["Chỉ màu nền", "Chỉ phông chữ", "Màu nền, màu chữ, phông chữ và các hiệu ứng trực quan", "Hiệu ứng chuyển trang"], correct: 2, cols: 1 },
+        { lesson: 12, lvl: "NB", q: "Để xoay hình ảnh một góc tùy ý, ta sử dụng biểu tượng nào trên hình ảnh?", options: ["Nút tròn ở các góc", "Mũi tên xoay vòng ở cạnh trên hình ảnh", "Nút vuông ở giữa", "Nút tam giác"], correct: 1, cols: 1 },
+        { lesson: 12, lvl: "NB", q: "Phím tắt dùng để sao chép văn bản là gì?", options: ["Ctrl + X", "Ctrl + V", "Ctrl + C", "Ctrl + P"], correct: 2, cols: 2 },
+        { lesson: 12, lvl: "NB", q: "Trong dải lệnh Picture Format, nút lệnh Picture Border dùng để làm gì?", options: ["Tạo hiệu ứng bóng đổ cho ảnh", "Thêm đường viền cho ảnh", "Cắt xén ảnh", "Đổi màu nền trang chiếu"], correct: 1, cols: 1 },
+        { lesson: 12, lvl: "NB", q: "Tổ hợp phím Ctrl + V dùng để thực hiện lệnh gì?", options: ["Cắt (Cut)", "Sao chép (Copy)", "Dán (Paste)", "Lưu (Save)"], correct: 2, cols: 2 },
+        { lesson: 12, lvl: "NB", q: "Lệnh Bring Forward dùng để làm gì đối với các đối tượng hình ảnh bị xếp chồng lên nhau?", options: ["Đưa đối tượng lên trên một lớp", "Đưa đối tượng xuống dưới cùng", "Xóa đối tượng", "Nhân bản đối tượng"], correct: 0, cols: 1 },
+        { lesson: 12, lvl: "NB", q: "Hình ảnh đưa vào bài trình chiếu cần phải đảm bảo điều kiện gì về mặt đạo đức?", options: ["Hình ảnh phải thật to", "Hình ảnh phải có bản quyền hoặc nguồn gốc rõ ràng", "Hình ảnh phải tự vẽ", "Hình ảnh phải có nhiều màu sắc"], correct: 1, cols: 1 },
+
+        // BÀI 13: HOÀN THIỆN BÀI TRÌNH CHIẾU
+        { lesson: 13, lvl: "NB", q: "Hiệu ứng động trong PowerPoint được chia làm mấy loại chính?", options: ["1 loại", "2 loại (Chuyển trang và Đối tượng)", "3 loại", "4 loại"], correct: 1, cols: 2 },
+        { lesson: 13, lvl: "NB", q: "Hiệu ứng chuyển trang (Transitions) được áp dụng cho đối tượng nào?", options: ["Từng dòng chữ", "Hình ảnh", "Toàn bộ trang chiếu", "Chỉ trang tiêu đề"], correct: 2, cols: 2 },
+        { lesson: 13, lvl: "NB", q: "Dải lệnh Animations dùng để tạo hiệu ứng cho đối tượng nào?", options: ["Trang chiếu", "Văn bản, hình ảnh trên trang chiếu", "Tệp âm thanh", "Tệp trình chiếu"], correct: 1, cols: 1 },
+        { lesson: 13, lvl: "NB", q: "Hiệu ứng xuất hiện (Entrance) thuộc dải lệnh nào?", options: ["Design", "Transitions", "Animations", "Slide Show"], correct: 2, cols: 2 },
+        { lesson: 13, lvl: "NB", q: "Nhóm hiệu ứng Emphasis trong Animations có biểu tượng màu gì?", options: ["Màu xanh lá cây", "Màu vàng", "Màu đỏ", "Màu xanh dương"], correct: 1, cols: 2 },
+        { lesson: 13, lvl: "NB", q: "Để loại bỏ hiệu ứng chuyển trang, ta chọn lệnh nào trong dải lệnh Transitions?", options: ["None", "Push", "Fade", "Wipe"], correct: 0, cols: 2 },
+        { lesson: 13, lvl: "TH", q: "Mục đích chính của việc sử dụng hiệu ứng động trong bài trình chiếu là gì?", options: ["Làm cho người xem bị phân tâm", "Làm cho bài trình chiếu sinh động, thu hút sự chú ý vào nội dung quan trọng", "Kéo dài thời gian thuyết trình", "Che giấu các lỗi chính tả"], correct: 1, cols: 1 },
+        { lesson: 13, lvl: "TH", q: "Theo nguyên tắc thiết kế, ta nên sử dụng hiệu ứng động như thế nào?", options: ["Càng nhiều hiệu ứng phức tạp càng tốt", "Sử dụng đơn giản, thống nhất và có chọn lọc", "Mỗi trang sử dụng một hiệu ứng chuyển trang khác nhau", "Chỉ dùng hiệu ứng cho hình ảnh, không dùng cho văn bản"], correct: 1, cols: 1 },
+        { lesson: 13, lvl: "TH", q: "Nếu áp dụng quá nhiều hiệu ứng rườm rà cho các dòng chữ liên tiếp nhau, điều gì sẽ xảy ra?", options: ["Bài trình chiếu trở nên chuyên nghiệp hơn", "Người xem sẽ ghi nhớ bài tốt hơn", "Gây mất tập trung và làm người xem rối mắt", "Dung lượng tệp sẽ nhỏ đi"], correct: 2, cols: 1 },
+        { lesson: 13, lvl: "TH", q: "Để bài trình chiếu có tính thống nhất, ta nên:", options: ["Áp dụng cùng một kiểu hiệu ứng chuyển trang cho tất cả các trang", "Mỗi trang dùng một phông chữ khác nhau", "Mỗi trang dùng một màu nền khác nhau", "Không bao giờ dùng hiệu ứng"], correct: 0, cols: 1 },
+        { lesson: 13, lvl: "TH", q: "Đâu là thao tác sắp xếp lại thứ tự xuất hiện của các hiệu ứng đối tượng?", options: ["Dùng lệnh Animation Pane và kéo thả các mục hiệu ứng", "Thay đổi màu chữ của đối tượng", "Đổi mẫu định dạng (Theme) mới", "Dùng dải lệnh View"], correct: 0, cols: 1 },
+        { lesson: 13, lvl: "TH", q: "Sự khác biệt cơ bản giữa Transitions và Animations là gì?", options: ["Transitions dùng cho hình ảnh, Animations dùng cho chữ", "Transitions là hiệu ứng chuyển giao giữa các trang, Animations là hiệu ứng của các đối tượng trên 1 trang", "Không có sự khác biệt", "Transitions chỉ có ở MS Word"], correct: 1, cols: 1 }
+    ];
+
+    const allTfBank = [
+        { lesson: 11, title: "Tìm hiểu về cấu trúc bài trình chiếu:", items: [
+            { text: "a) Trang tiêu đề thường là trang đầu tiên, cho biết chủ đề của bài trình chiếu.", ans: "D" },
+            { text: "b) Trang nội dung bắt buộc phải có hình ảnh minh họa.", ans: "S" },
+            { text: "c) Mỗi trang chiếu thường có một tiêu đề trang.", ans: "D" },
+            { text: "d) Cấu trúc phân cấp giúp thông tin được trình bày mạch lạc, rõ ràng.", ans: "D" }
+        ]},
+        { lesson: 11, title: "Thao tác cơ bản trên phần mềm trình chiếu:", items: [
+            { text: "a) Tổ hợp phím Ctrl + M dùng để lưu bài trình chiếu.", ans: "S" },
+            { text: "b) Layout là các mẫu bố trí nội dung đã được thiết kế sẵn.", ans: "D" },
+            { text: "c) Để thêm mức phân cấp (lùi đầu dòng), ta nhấn phím Tab.", ans: "D" },
+            { text: "d) Không thể thay đổi Layout của một trang chiếu sau khi đã tạo.", ans: "S" }
+        ]},
+        { lesson: 11, title: "Phân tích cấu trúc phân cấp:", items: [
+            { text: "a) Cấu trúc phân cấp chỉ cho phép tối đa 2 mức.", ans: "S" },
+            { text: "b) Nhấn Shift + Tab để giảm mức phân cấp (đưa nội dung ra lề trái).", ans: "D" },
+            { text: "c) Kí hiệu đầu dòng (bullet) của các mức phân cấp khác nhau thường giống hệt nhau.", ans: "S" },
+            { text: "d) Sử dụng cấu trúc phân cấp giúp người xem dễ nắm bắt các ý chính và ý phụ.", ans: "D" }
+        ]},
+        { lesson: 12, title: "Định dạng văn bản và hình ảnh:", items: [
+            { text: "a) Ta có thể sao chép một đoạn văn từ Word và dán (Paste) vào PowerPoint.", ans: "D" },
+            { text: "b) Không thể thay đổi màu sắc của chữ trên trang chiếu.", ans: "S" },
+            { text: "c) Hình ảnh chèn vào trang chiếu có thể phóng to, thu nhỏ tùy ý.", ans: "D" },
+            { text: "d) Mẫu định dạng (Theme) chỉ thay đổi màu nền, không làm thay đổi phông chữ.", ans: "S" }
+        ]},
+        { lesson: 12, title: "Nguyên tắc thiết kế trang chiếu:", items: [
+            { text: "a) Nên đưa toàn bộ đoạn văn bản dài vào một trang chiếu để người xem tự đọc.", ans: "S" },
+            { text: "b) Màu chữ và màu nền nên có độ tương phản cao để dễ nhìn (VD: nền tối - chữ sáng).", ans: "D" },
+            { text: "c) Hình ảnh minh họa cần phù hợp với nội dung bài thuyết trình.", ans: "D" },
+            { text: "d) Lấy bất kỳ hình ảnh nào trên Internet đưa vào bài trình chiếu cũng không vi phạm bản quyền.", ans: "S" }
+        ]},
+        { lesson: 12, title: "Sử dụng mẫu định dạng (Theme):", items: [
+            { text: "a) Theme giúp bài trình chiếu có định dạng thống nhất, chuyên nghiệp một cách nhanh chóng.", ans: "D" },
+            { text: "b) Lệnh chọn Theme nằm trong dải lệnh Design.", ans: "D" },
+            { text: "c) Mỗi tệp trình chiếu chỉ được phép sử dụng một Theme mặc định duy nhất (Office Theme).", ans: "S" },
+            { text: "d) Khi đổi Theme, vị trí các hộp văn bản có thể tự động thay đổi theo mẫu mới.", ans: "D" }
+        ]},
+        { lesson: 12, title: "Thao tác với đối tượng hình ảnh:", items: [
+            { text: "a) Có thể tạo đường viền (Border) cho hình ảnh để hình ảnh nổi bật hơn.", ans: "D" },
+            { text: "b) Nút lệnh Send Backward dùng để đưa hình ảnh lên lớp trên cùng.", ans: "S" },
+            { text: "c) Khi thu nhỏ hình ảnh, ta nên kéo các góc để ảnh không bị méo tỉ lệ.", ans: "D" },
+            { text: "d) Phần mềm trình chiếu không hỗ trợ việc xoay (Rotate) hình ảnh.", ans: "S" }
+        ]},
+        { lesson: 12, title: "Thực hành chèn đối tượng:", items: [
+            { text: "a) Lệnh Insert > Pictures dùng để chèn hình ảnh vào trang chiếu.", ans: "D" },
+            { text: "b) Văn bản được sao chép từ ngoài vào luôn luôn bị mất định dạng ban đầu.", ans: "S" },
+            { text: "c) Việc lựa chọn phông chữ đơn giản, dễ đọc (như Arial, Calibri) là rất cần thiết.", ans: "D" },
+            { text: "d) Một trang chiếu chứa càng nhiều hình ảnh thì càng đẹp và chuẩn khoa học.", ans: "S" }
+        ]},
+        { lesson: 13, title: "Hiệu ứng động trong trình chiếu:", items: [
+            { text: "a) Hiệu ứng động làm bài trình chiếu trở nên hấp dẫn hơn.", ans: "D" },
+            { text: "b) Transitions là hiệu ứng áp dụng cho các dòng chữ bên trong trang chiếu.", ans: "S" },
+            { text: "c) Animations là dải lệnh dùng để tạo hiệu ứng cho các đối tượng (chữ, ảnh).", ans: "D" },
+            { text: "d) Nên áp dụng hiệu ứng âm thanh (tiếng pháo tay, tiếng nổ) cho mỗi lần chuyển trang.", ans: "S" }
+        ]},
+        { lesson: 13, title: "Nguyên tắc sử dụng hiệu ứng:", items: [
+            { text: "a) Hiệu ứng chuyển trang nên được sử dụng thống nhất cho toàn bộ bài trình chiếu.", ans: "D" },
+            { text: "b) Sử dụng hiệu ứng xuất hiện từ từ cho từng dòng chữ sẽ giúp người xem dễ theo dõi nội dung.", ans: "D" },
+            { text: "c) Càng dùng nhiều kiểu hiệu ứng nhấp nháy phức tạp thì bài thuyết trình càng thành công.", ans: "S" },
+            { text: "d) Hiệu ứng động có thể điều chỉnh để tự động xuất hiện hoặc xuất hiện khi click chuột.", ans: "D" }
+        ]},
+        { lesson: 13, title: "Thao tác tạo hiệu ứng:", items: [
+            { text: "a) Để gỡ bỏ hiệu ứng của đối tượng, ta chọn đối tượng rồi nhấn phím Delete trên bàn phím.", ans: "S" },
+            { text: "b) Bảng Animation Pane cho phép ta xem danh sách và chỉnh sửa thứ tự các hiệu ứng.", ans: "D" },
+            { text: "c) Lệnh Apply To All trong thẻ Transitions giúp áp dụng một hiệu ứng chuyển trang cho tất cả các slide.", ans: "D" },
+            { text: "d) Nhóm hiệu ứng Entrance (màu xanh lá) dùng để làm đối tượng biến mất khỏi màn hình.", ans: "S" }
+        ]},
+        { lesson: 13, title: "Hoàn thiện bài trình chiếu:", items: [
+            { text: "a) Trước khi trình chiếu chính thức, ta cần rà soát lại lỗi chính tả và hiệu ứng.", ans: "D" },
+            { text: "b) Hiệu ứng động tốt là hiệu ứng không làm người xem phân tâm khỏi nội dung chính.", ans: "D" },
+            { text: "c) Trong thẻ Animations, lệnh Start: On Click nghĩa là hiệu ứng tự động chạy cùng lúc với hiệu ứng trước.", ans: "S" },
+            { text: "d) Có thể thiết lập thời gian chạy nhanh hay chậm cho một hiệu ứng (Duration).", ans: "D" }
+        ]}
+    ];
+
+    const allEssayBank = [
+        { lesson: 11, text: "Em được giao nhiệm vụ tạo một bài trình chiếu giới thiệu về 'Lịch sử phát triển máy tính'. Hãy nêu nội dung em dự định trình bày trên Trang tiêu đề và thiết kế cấu trúc phân cấp (gồm ý chính và ý phụ) cho 1 trang nội dung giới thiệu về 'Các thế hệ máy tính'? (1.0 điểm)" },
+        { lesson: 11, text: "Nêu các bước thực hiện để thêm một trang chiếu mới và thay đổi mẫu bố trí (Layout) của trang chiếu đó thành dạng 'Title and Content' (Tiêu đề và nội dung)? Vì sao phải sử dụng đúng mẫu bố trí? (1.0 điểm)" },
+        { lesson: 11, text: "Cho một đoạn văn bản tóm tắt chưa được định dạng. Em hãy mô tả thao tác để chuyển đổi đoạn văn bản đó thành danh sách có cấu trúc phân cấp (Sử dụng lệnh Bullet và phím Tab) trên phần mềm MS PowerPoint? (1.0 điểm)" },
+        { lesson: 12, text: "Trong bài thuyết trình về 'Bảo vệ môi trường', em muốn chèn một bức ảnh minh họa và tạo đường viền (Border) màu xanh lá cây cho bức ảnh đó. Em hãy trình bày các bước thực hiện chi tiết? (1.0 điểm)" },
+        { lesson: 12, text: "Giả sử em có một đoạn văn bản tóm tắt nội dung trong tệp MS Word. Hãy trình bày thao tác sao chép đoạn văn bản đó sang MS PowerPoint và nêu 2 nguyên tắc cần lưu ý khi định dạng lại đoạn văn bản đó trên trang chiếu (về phông chữ, cỡ chữ, màu sắc...)? (1.0 điểm)" },
+        { lesson: 12, text: "Mẫu định dạng (Theme) là gì? Hãy nêu các bước áp dụng một mẫu định dạng có sẵn cho bài trình chiếu của em. Tại sao việc sử dụng Theme lại giúp bài trình chiếu trở nên chuyên nghiệp hơn? (1.0 điểm)" },
+        { lesson: 13, text: "Để thu hút sự chú ý của khán giả vào một dòng chữ quan trọng trên màn hình, em sẽ sử dụng nhóm hiệu ứng động nào (Entrance, Emphasis hay Exit)? Hãy trình bày các bước áp dụng hiệu ứng đó. (1.0 điểm)" },
+        { lesson: 13, text: "Em hãy nêu sự khác nhau cơ bản giữa hiệu ứng chuyển trang (Transitions) và hiệu ứng đối tượng (Animations)? Trình bày các bước để áp dụng hiệu ứng chuyển trang 'Fade' cho toàn bộ các trang trong bài thuyết trình. (1.0 điểm)" },
+        { lesson: 13, text: "Một bạn học sinh thêm rất nhiều hiệu ứng chữ bay nhảy, xoay vòng lộn xộn vào bài trình chiếu với mong muốn làm bài sinh động hơn. Theo em, điều này có vi phạm nguyên tắc sử dụng hiệu ứng không? Vì sao? Em có lời khuyên gì cho bạn? (1.0 điểm)" }
+    ];
+
+    // ==========================================
+    // 2. THUẬT TOÁN XÁO TRỘN & BỐC ĐỀ CHUẨN MA TRẬN
+    // ==========================================
+    function shuffleArray(array) {
+        let curId = array.length;
+        while (0 !== curId) {
+            let randId = Math.floor(Math.random() * curId);
+            curId -= 1;
+            let tmp = array[curId]; array[curId] = array[randId]; array[randId] = tmp;
+        }
+        return array;
+    }
+
+    let selectedMcq = [], selectedTf = [], selectedEssay = [];
+
+    function generateRandomExam() {
+        // 1. RÚT TRẮC NGHIỆM (MCQ) - Theo đúng ma trận
+        let mcq11_NB = shuffleArray(allMcqBank.filter(q => q.lesson === 11 && q.lvl === "NB")).slice(0, 4);
+        let mcq12_NB = shuffleArray(allMcqBank.filter(q => q.lesson === 12 && q.lvl === "NB")).slice(0, 4);
+        let mcq13_NB = shuffleArray(allMcqBank.filter(q => q.lesson === 13 && q.lvl === "NB")).slice(0, 2);
+        let mcq13_TH = shuffleArray(allMcqBank.filter(q => q.lesson === 13 && q.lvl === "TH")).slice(0, 2);
+        
+        selectedMcq = shuffleArray([...mcq11_NB, ...mcq12_NB, ...mcq13_NB, ...mcq13_TH]);
+
+        // Đảo phương án MCQ
+        selectedMcq.forEach(q => {
+            let optsWithStatus = q.options.map((text, idx) => ({ text: text, isCorrect: (idx === q.correct) }));
+            optsWithStatus = shuffleArray(optsWithStatus);
+            q.options = optsWithStatus.map(o => o.text);
+            q.correct = optsWithStatus.findIndex(o => o.isCorrect); 
+        });
+
+        // 2. RÚT ĐÚNG/SAI (T/F) - 4 câu
+        let tf11 = shuffleArray(allTfBank.filter(q => q.lesson === 11))[0];
+        let tf12_1 = shuffleArray(allTfBank.filter(q => q.lesson === 12))[0];
+        let tf12_2 = shuffleArray(allTfBank.filter(q => q.lesson === 12))[1]; 
+        let tf13 = shuffleArray(allTfBank.filter(q => q.lesson === 13))[0];
+        
+        selectedTf = shuffleArray([tf11, tf12_1, tf12_2, tf13]);
+
+        // 3. RÚT TỰ LUẬN (ESSAY) - 3 câu
+        let es11 = shuffleArray(allEssayBank.filter(q => q.lesson === 11))[0];
+        let es12 = shuffleArray(allEssayBank.filter(q => q.lesson === 12))[0];
+        let es13 = shuffleArray(allEssayBank.filter(q => q.lesson === 13))[0];
+        
+        selectedEssay = [es11.text, es12.text, es13.text]; 
+    }
+
+    // ==========================================
+    // 3. GIAO DIỆN & HOẠT ĐỘNG
+    // ==========================================
+    let timeStart = new Date();
+    let duration = 45 * 60; 
+    let timerInterval;
+
+    function encodeUTF8(str) {
+        return btoa(unescape(encodeURIComponent(str || "")));
+    }
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        let icon = '<i class="fa-solid fa-circle-check"></i>';
+        if (type === 'error') icon = '<i class="fa-solid fa-circle-exclamation"></i>';
+        if (type === 'warning') icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 3000);
+    }
+
+    window.onload = function() {
+        const studentName = sessionStorage.getItem('exam_name') || "Thí sinh tự do";
+        const studentClass = sessionStorage.getItem('exam_class') || "---";
+        
+        const schoolKey = sessionStorage.getItem('exam_school');
+        let schoolName = "Chưa cập nhật";
+        if (typeof CONFIG !== 'undefined' && schoolKey && CONFIG.SCHOOLS[schoolKey]) {
+            schoolName = CONFIG.SCHOOLS[schoolKey].name;
+        }
+
+        document.getElementById('display-name').innerText = studentName;
+        document.getElementById('display-school').innerText = schoolName.toUpperCase();
+        document.getElementById('display-class').innerText = studentClass;
+
+        generateRandomExam(); 
+        renderExam();
+        renderPalette(); 
+        startTimer();
+    };
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            duration--;
+            let m = Math.floor(duration / 60);
+            let s = duration % 60;
+            document.getElementById('timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (duration <= 0) {
+                clearInterval(timerInterval);
+                closeSubmitModal();
+                showToast("Đã hết thời gian làm bài! Hệ thống đang tự động nộp bài...", "warning");
+                executeSubmit();
+            }
+        }, 1000);
+    }
+
+    function renderExam() {
+        const container = document.getElementById('quiz-container');
+        let html = "";
+        let globalQIndex = 1; 
+
+        // RENDER MCQ
+        html += `<div class="section-title">I. PHẦN TRẮC NGHIỆM NHIỀU LỰA CHỌN (3.0 ĐIỂM)</div>`;
+        selectedMcq.forEach((q, index) => {
+            let gridClass = q.cols === 2 ? "grid-2" : "grid-1";
+            html += `
+            <div class="question-card" id="q-${globalQIndex}">
+                <div class="question-text"><span>Câu ${globalQIndex}:</span> ${q.q}</div>
+                <div class="mcq-options ${gridClass}">`;
+            q.options.forEach((opt, optIndex) => {
+                let letter = ["A", "B", "C", "D"][optIndex];
+                html += `
+                    <label class="mcq-option">
+                        <input type="radio" name="mcq_${index}" value="${optIndex}" onchange="markAnswered(${globalQIndex})">
+                        <b>${letter}.</b> &nbsp;${opt}
+                    </label>`;
+            });
+            html += `</div></div>`;
+            globalQIndex++;
+        });
+
+        // RENDER T/F
+        html += `<div class="section-title" style="margin-top: 30px;">II. PHẦN TRẮC NGHIỆM ĐÚNG/SAI (4.0 ĐIỂM)</div>`;
+        selectedTf.forEach((q, qIndex) => {
+            html += `
+            <div class="question-card" id="q-${globalQIndex}">
+                <div class="question-text"><span>Câu ${globalQIndex}:</span> ${q.title}</div>
+                <table class="tf-table">
+                    <tr>
+                        <th class="tf-text">Nội dung ý</th>
+                        <th style="width: 60px;">ĐÚNG</th>
+                        <th style="width: 60px;">SAI</th>
+                    </tr>`;
+            q.items.forEach((item, iIndex) => {
+                html += `
+                    <tr>
+                        <td class="tf-text">${item.text}</td>
+                        <td><input type="radio" name="tf_${qIndex}_${iIndex}" value="D" class="tf-radio" onchange="markAnswered(${globalQIndex})"></td>
+                        <td><input type="radio" name="tf_${qIndex}_${iIndex}" value="S" class="tf-radio" onchange="markAnswered(${globalQIndex})"></td>
+                    </tr>`;
+            });
+            html += `</table></div>`;
+            globalQIndex++;
+        });
+
+        // RENDER ESSAY
+        html += `<div class="section-title" style="margin-top: 30px;">III. PHẦN TỰ LUẬN (3.0 ĐIỂM)</div>`;
+        selectedEssay.forEach((qText, index) => {
+            html += `
+            <div class="question-card" id="q-${globalQIndex}">
+                <div class="question-text"><span>Câu ${globalQIndex}:</span><br>${qText}</div>
+                <div class="rte-container">
+                    <div class="rte-toolbar">
+                        <button class="rte-btn" type="button" title="In đậm" onclick="execCmd('bold', '${index}')"><i class="fa-solid fa-bold"></i></button>
+                        <button class="rte-btn" type="button" title="In nghiêng" onclick="execCmd('italic', '${index}')"><i class="fa-solid fa-italic"></i></button>
+                        <button class="rte-btn" type="button" title="Gạch chân" onclick="execCmd('underline', '${index}')"><i class="fa-solid fa-underline"></i></button>
+                        <div class="rte-btn" title="Màu chữ">
+                            <i class="fa-solid fa-palette"></i>
+                            <input type="color" onchange="execCmd('foreColor', '${index}', this.value)">
+                        </div>
+                        <div class="rte-btn" title="Cỡ chữ">
+                            <i class="fa-solid fa-text-height"></i>
+                            <select onchange="execCmd('fontSize', '${index}', this.value)">
+                                <option value="3">Vừa</option>
+                                <option value="5">Lớn</option>
+                                <option value="7">Rất lớn</option>
+                            </select>
+                        </div>
+                        <label class="rte-btn" title="Chụp ảnh / Chọn ảnh từ máy">
+                            <i class="fa-solid fa-camera"></i> Đính kèm ảnh
+                            <input type="file" accept="image/*" capture="environment" onchange="insertImage(this, '${index}', ${globalQIndex})">
+                        </label>
+                    </div>
+                    <div class="essay-box" id="essay_${index}" contenteditable="true" placeholder="Nhập câu trả lời của em vào đây..." oninput="markAnswered(${globalQIndex}, this.innerHTML)"></div>
+                </div>
+            </div>`;
+            globalQIndex++;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function renderPalette() {
+        const paletteContainer = document.getElementById('palette-container');
+        let html = "";
+        let totalQuestions = selectedMcq.length + selectedTf.length + selectedEssay.length;
+        for (let i = 1; i <= totalQuestions; i++) {
+            html += `<button class="palette-btn" id="pal-${i}" onclick="scrollToQ(${i})">${i}</button>`;
+        }
+        paletteContainer.innerHTML = html;
+    }
+
+    function scrollToQ(qId) { document.getElementById(`q-${qId}`).scrollIntoView({ behavior: "smooth", block: "center" }); }
+
+    function markAnswered(qId, textValue = true) {
+        const btn = document.getElementById(`pal-${qId}`);
+        if (typeof textValue === 'string') {
+            let tempDiv = document.createElement('div'); tempDiv.innerHTML = textValue;
+            if (tempDiv.textContent.trim() !== "" || textValue.includes("<img")) btn.classList.add("answered");
+            else btn.classList.remove("answered");
+        } else btn.classList.add("answered");
+    }
+
+    function execCmd(command, essayIndex, value = null) {
+        document.getElementById(`essay_${essayIndex}`).focus(); document.execCommand(command, false, value);
+    }
+
+    function insertImage(input, essayIndex, globalQIndex) {
+        const file = input.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width; let height = img.height;
+                if (width > 800) { height = Math.round(height * (800 / width)); width = 800; }
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                document.getElementById(`essay_${essayIndex}`).focus();
+                document.execCommand('insertImage', false, dataUrl);
+                markAnswered(globalQIndex, "image_added");
+            }
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    // ==========================================
+    // 4. MODAL XÁC NHẬN NỘP BÀI VÀ XỬ LÝ DỮ LIỆU
+    // ==========================================
+    function openSubmitModal() {
+        const unanswered = document.querySelectorAll('.palette-btn:not(.answered)').length;
+        const msgEl = document.getElementById('submit-msg');
+        if (unanswered > 0) {
+            msgEl.innerHTML = `Bạn còn <b style="color:var(--danger);">${unanswered} câu chưa làm</b>.<br>Bạn có chắc chắn muốn nộp bài thi?`;
+        } else {
+            msgEl.innerText = "Bạn đã hoàn thành tất cả câu hỏi. Xác nhận nộp bài thi?";
+        }
+        document.getElementById('submitModal').style.display = 'flex';
+    }
+
+    function closeSubmitModal() {
+        document.getElementById('submitModal').style.display = 'none';
+    }
+
+    function executeSubmit() {
+        closeSubmitModal();
+        clearInterval(timerInterval);
+        
+        const btn = document.getElementById('btn-submit');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang nộp bài...';
+        btn.disabled = true;
+
+        // --- CẬP NHẬT: LẤY ĐÚNG LINK SCRIPT CỦA TRƯỜNG ---
+        const schoolKey = sessionStorage.getItem('exam_school');
+        if (typeof CONFIG === 'undefined' || !CONFIG.SCHOOLS[schoolKey] || !CONFIG.SCHOOLS[schoolKey].scriptUrl) {
+            showToast("Lỗi hệ thống: Không tìm thấy máy chủ dữ liệu của trường!", "error");
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> NỘP LẠI';
+            btn.disabled = false;
+            return;
+        }
+        const scriptUrl = CONFIG.SCHOOLS[schoolKey].scriptUrl;
+        const schoolName = CONFIG.SCHOOLS[schoolKey].name; // Để gửi lên sheet
+
+        let scoreMCQ = 0; 
+        let scoreTF = 0; 
+        let answersCodeArray = []; 
+
+        // 1. Chấm điểm MCQ
+        let mcqAnsStr = "";
+        selectedMcq.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="mcq_${index}"]:checked`);
+            let userAns = selected ? parseInt(selected.value) : -1;
+            let letterAns = userAns > -1 ? ["A", "B", "C", "D"][userAns] : "X";
+            if (userAns === q.correct) scoreMCQ += 0.25;
+            mcqAnsStr += `C${index + 1}${letterAns}-`;
+        });
+        answersCodeArray.push(mcqAnsStr.slice(0, -1));
+
+        // 2. Chấm điểm T/F
+        let tfAnsStr = "";
+        selectedTf.forEach((q, qIndex) => {
+            q.items.forEach((item, iIndex) => {
+                const selected = document.querySelector(`input[name="tf_${qIndex}_${iIndex}"]:checked`);
+                const userAns = selected ? selected.value : "X";
+                const qNum = qIndex + 13; 
+                const letter = ["a", "b", "c", "d"][iIndex];
+                if (userAns === item.ans) scoreTF += 0.25;
+                tfAnsStr += `C${qNum}${letter}${userAns}-`;
+            });
+        });
+        answersCodeArray.push(tfAnsStr.slice(0, -1));
+
+        // 3. Gom Tự luận
+        let essayEncodedStr = "";   
+        let essayPlainForSheet = ""; 
+        
+        selectedEssay.forEach((qText, index) => {
+            let htmlAns = document.getElementById(`essay_${index}`).innerHTML.trim();
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlAns;
+            let plainText = tempDiv.textContent.trim();
+
+            if(plainText === "" && !htmlAns.includes("<img")) {
+                htmlAns = "";
+                plainText = "(Không trả lời)";
+            }
+
+            essayPlainForSheet += `Câu ${index + 17}:\n${plainText}\n\n`;
+            let base64Ans = htmlAns ? encodeUTF8(htmlAns) : "X";
+            essayEncodedStr += `C${index + 17}:${base64Ans}-`; 
+        });
+
+        let totalScore = scoreMCQ + scoreTF; 
+        const timeEnd = new Date();
+        const timeTaken = Math.floor((timeEnd - timeStart) / 1000);
+        let timeTakenStr = `${Math.floor(timeTaken / 60)} phút ${timeTaken % 60} giây`;
+        let deviceInfo = /Mobi|Android/i.test(navigator.userAgent) ? "Điện thoại/Tablet" : "Máy tính";
+
+        // 4. CHUẨN BỊ PAYLOAD
+        const payload = {
+            action: "submitExam",
+            timeStart: timeStart.toLocaleTimeString('vi-VN'),
+            timeEnd: timeEnd.toLocaleTimeString('vi-VN'),
+            timeTaken: timeTakenStr,
+            name: sessionStorage.getItem('exam_name') || "Không tên",
+            className: sessionStorage.getItem('exam_class') || "0",
+            school: schoolName, // Gửi tên trường thực tế
+            deviceInfo: deviceInfo,
+            location: "Chờ cấp quyền",
+            scoreTNLQ: scoreMCQ.toFixed(2),
+            scoreTF: scoreTF.toFixed(2),
+            scoreShort: 0,
+            essay: essayPlainForSheet.trim(),       
+            correct: "---",
+            totalScore: totalScore.toFixed(2),
+            detailCode: answersCodeArray.join('*'), 
+            encodedEssay: essayEncodedStr.slice(0, -1) 
+        };
+
+        // GỬI LÊN APPS SCRIPT VỚI SCRIPT URL ĐÃ LẤY TỪ CONFIG
+        fetch(scriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            sessionStorage.setItem('report_time', timeTakenStr);
+            sessionStorage.setItem('report_score_tn', totalScore.toFixed(2));
+            sessionStorage.setItem('report_subject', 'Tin học 7'); 
+            
+            let mcqReportQ = "<tr>", mcqReportA = "<tr>", mcqReportQ2 = "<tr>", mcqReportA2 = "<tr>"; 
+            selectedMcq.forEach((q, i) => {
+                const selected = document.querySelector(`input[name="mcq_${i}"]:checked`);
+                let userAns = selected ? ["A","B","C","D"][parseInt(selected.value)] : "";
+                if (i < 10) { mcqReportQ += `<th>C.${i+1}</th>`; mcqReportA += `<td>${userAns}</td>`; }
+                else { mcqReportQ2 += `<th>C.${i+1}</th>`; mcqReportA2 += `<td>${userAns}</td>`; }
+            });
+            sessionStorage.setItem('report_mcq', mcqReportQ + "</tr>" + mcqReportA + "</tr>" + mcqReportQ2 + "</tr>" + mcqReportA2 + "</tr>");
+
+            let tfReportHtml = "<tr><th>Câu</th><th>Ý a</th><th>Ý b</th><th>Ý c</th><th>Ý d</th></tr>";
+            selectedTf.forEach((q, qIndex) => {
+                let row = `<tr><td><b>Câu ${qIndex + 13}</b></td>`;
+                q.items.forEach((item, iIndex) => {
+                    const selected = document.querySelector(`input[name="tf_${qIndex}_${iIndex}"]:checked`);
+                    let userAns = selected ? selected.value : "";
+                    row += `<td>${userAns === 'D' ? 'Đ' : (userAns === 'S' ? 'S' : '')}</td>`;
+                });
+                tfReportHtml += row + "</tr>";
+            });
+            sessionStorage.setItem('report_tf', tfReportHtml);
+
+            let essayReportHtml = "";
+            selectedEssay.forEach((qText, i) => {
+                let htmlAns = document.getElementById(`essay_${i}`).innerHTML.trim();
+                let tempDiv = document.createElement('div'); tempDiv.innerHTML = htmlAns;
+                if(tempDiv.textContent.trim() === "" && !htmlAns.includes("<img")) htmlAns = "<i>(Bỏ trống)</i>";
+                essayReportHtml += `
+                <div class="essay-item" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">
+                    <b style="color: #2563eb;">Câu ${i + 17}:</b><br>
+                    <div style="margin-top: 5px;"><b>Trả lời:</b><br>${htmlAns}</div>
+                </div>`;
+            });
+            sessionStorage.setItem('report_essay', essayReportHtml);
+
+            window.location.href = "Report_hs.html";
+        }).catch(err => {
+            console.error(err);
+            showToast("Lỗi mạng! Vui lòng thử bấm nộp bài lại.", "error");
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> GỬI LẠI';
+            btn.disabled = false;
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Tài Khoản Học Sinh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="config.js"></script>
+
+    <style>
+        :root { --primary: #0ea5e9; --primary-hover: #0284c7; --bg: #f1f5f9; --text: #1e293b; --border: #cbd5e1; --danger: #ef4444; }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
+            min-height: 100vh; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            color: var(--text);
+            padding: 20px;
+        }
+
+        .register-wrapper {
+            background: white;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+        }
+        
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            opacity: 0.8;
+            transition: 0.2s;
+        }
+        .btn-back:hover { opacity: 1; transform: translateX(-3px); }
+
+        .header i.main-icon { font-size: 45px; margin-bottom: 15px; }
+        .header h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 14px; }
+
+        .form-content { padding: 30px; }
+
+        .row { display: flex; gap: 15px; }
+        .col { flex: 1; }
+
+        .input-group { margin-bottom: 20px; position: relative; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #475569; }
+        .input-group i { position: absolute; bottom: 14px; left: 15px; color: #94a3b8; }
+        
+        .input-group input, .input-group select {
+            width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 15px; transition: 0.2s; outline: none; background: #f8fafc;
+        }
+        .input-group select { cursor: pointer; appearance: none; }
+        
+        .select-wrapper::after {
+            content: '\f0d7'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; right: 15px; bottom: 12px; color: #94a3b8; pointer-events: none;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+        .input-group input:focus + i { color: var(--primary); }
+        .input-group select:disabled { background: #e2e8f0; cursor: not-allowed; opacity: 0.7; }
+
+        .btn-submit {
+            width: 100%; padding: 14px; border: none; border-radius: 8px; background: var(--success, #10b981);
+            color: white; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-submit:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
+
+        .help-text { text-align: center; margin-top: 20px; font-size: 14px; color: #64748b; }
+        .help-text a { color: var(--primary); text-decoration: none; font-weight: bold; }
+        .help-text a:hover { text-decoration: underline; color: var(--primary-hover); }
+
+        @media (max-width: 480px) {
+            .row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-wrapper">
+    <div class="header">
+        <a href="index.html" class="btn-back" title="Quay lại"><i class="fa-solid fa-arrow-left"></i></a>
+        <i class="fa-solid fa-user-plus main-icon"></i>
+        <h1>Đăng Ký Tài Khoản</h1>
+        <p>Tạo tài khoản học sinh mới</p>
+    </div>
+
+    <div class="form-content">
+        
+        <div class="input-group">
+            <label>Tài khoản đăng nhập</label>
+            <input type="text" id="reg-username" placeholder="VD: HS123456">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+        <div class="row">
+            <div class="input-group col">
+                <label>Mật khẩu</label>
+                <input type="password" id="reg-password" placeholder="Nhập mật khẩu">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div class="input-group col">
+                <label>Xác nhận mật khẩu</label>
+                <input type="password" id="reg-confirm" placeholder="Nhập lại mật khẩu">
+                <i class="fa-solid fa-check-double"></i>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px dashed var(--border); margin: 5px 0 25px 0;">
+
+        <div class="input-group">
+            <label>Họ và tên thí sinh</label>
+            <input type="text" id="reg-name" placeholder="VD: Nguyễn Văn A">
+            <i class="fa-solid fa-id-card"></i>
+        </div>
+
+        <div class="input-group">
+            <label>Trường</label>
+            <input type="text" id="reg-school" placeholder="VD: THCS THAH" value="THCS THAH">
+            <i class="fa-solid fa-school"></i>
+        </div>
+
+        <div class="row">
+            <div class="input-group col select-wrapper">
+                <label>Khối</label>
+                <select id="reg-grade" onchange="updateClassList()">
+                    <option value="" disabled selected>-- Chọn khối --</option>
+                    <option value="6">Khối 6</option>
+                    <option value="7">Khối 7</option>
+                    <option value="8">Khối 8</option>
+                    <option value="9">Khối 9</option>
+                </select>
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div class="input-group col select-wrapper">
+                <label>Lớp</label>
+                <select id="reg-class" disabled>
+                    <option value="" disabled selected>-- Chọn lớp --</option>
+                </select>
+                <i class="fa-solid fa-users-line"></i>
+            </div>
+        </div>
+
+        <button class="btn-submit" id="btn-register" onclick="handleRegister()"><i class="fa-solid fa-check-to-slot"></i> HOÀN TẤT ĐĂNG KÝ</button>
+        
+        <div class="help-text">
+            <p>Đã có tài khoản? <a href="index.html">Đăng nhập ngay</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        if (typeof CONFIG === 'undefined') {
+            alert("⚠️ Không tải được file cấu hình config.js!");
+        }
+    };
+
+    // ==========================================
+    // TỰ ĐỘNG TẠO DANH SÁCH LỚP THEO KHỐI
+    // ==========================================
+    function updateClassList() {
+        const grade = document.getElementById('reg-grade').value;
+        const classSelect = document.getElementById('reg-class');
+        
+        classSelect.innerHTML = '<option value="" disabled selected>-- Chọn lớp --</option>';
+        classSelect.disabled = false;
+        
+        if (grade) {
+            // Tự động tạo 3 lớp (VD: Khối 6 -> 6/1, 6/2, 6/3)
+            for (let i = 1; i <= 3; i++) {
+                let option = document.createElement('option');
+                option.value = grade + '/' + i;
+                option.text = 'Lớp ' + grade + '/' + i;
+                classSelect.appendChild(option);
+            }
+        } else {
+            classSelect.disabled = true;
+        }
+    }
+
+    // ==========================================
+    // API: XỬ LÝ ĐĂNG KÝ
+    // ==========================================
+    async function handleRegister() {
+        const username = document.getElementById('reg-username').value.trim();
+        const pass = document.getElementById('reg-password').value;
+        const confirmPass = document.getElementById('reg-confirm').value;
+        const name = document.getElementById('reg-name').value.trim();
+        const school = document.getElementById('reg-school').value.trim();
+        const grade = document.getElementById('reg-grade').value; 
+        const className = document.getElementById('reg-class').value;
+
+        if (!username || !pass || !confirmPass || !name || !school || !grade || !className) {
+            alert("⚠️ Vui lòng điền đầy đủ tất cả các thông tin, kể cả Khối và Lớp!");
+            return;
+        }
+
+        if (pass !== confirmPass) {
+            alert("❌ Mật khẩu và Xác nhận mật khẩu không khớp nhau!");
+            document.getElementById('reg-confirm').focus();
+            return;
+        }
+
+        const btnReg = document.getElementById('btn-register');
+        btnReg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+        btnReg.disabled = true;
+
+        try {
+            const requestData = {
+                action: "register",
+                username: username,
+                password: pass,
+                name: name,
+                school: school,
+                grade: grade,
+                className: className
+            };
+
+            const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify(requestData)
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+                alert(`✅ ${result.message}\n\nBạn sẽ được chuyển hướng về trang Đăng nhập.`);
+                window.location.href = "index.html";
+            } else {
+                alert("❌ Lỗi: " + result.message);
+                btnReg.innerHTML = '<i class="fa-solid fa-check-to-slot"></i> HOÀN TẤT ĐĂNG KÝ';
+                btnReg.disabled = false;
+            }
+        } catch (error) {
+            console.error("Lỗi Đăng ký:", error);
+            alert("❌ Có lỗi xảy ra trong quá trình gửi dữ liệu, vui lòng kiểm tra kết nối mạng!");
+            btnReg.innerHTML = '<i class="fa-solid fa-check-to-slot"></i> HOÀN TẤT ĐĂNG KÝ';
+            btnReg.disabled = false;
+        }
+    }
+
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') handleRegister();
+    });
+</script>
+
+</body>
+</html>

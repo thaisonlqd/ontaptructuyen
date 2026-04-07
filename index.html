@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Ôn Tập - Đăng Nhập</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="config.js"></script>
+
+    <style>
+        :root { 
+            --primary: #2563eb; 
+            --bg-body: #f1f5f9; 
+            --text-main: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: var(--bg-body); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 20px;
+        }
+
+        .card { 
+            background: white; padding: 35px 30px; border-radius: 15px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; 
+        }
+
+        .logo { font-size: 50px; font-weight: 900; text-align: center; color: #0020dd; margin-bottom: 10px; }
+        .logo span { color: #7000a0; }
+        
+        h2 { text-align: center; font-size: 18px; text-transform: uppercase; margin-bottom: 25px; color: var(--text-main); }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 6px; color: #64748b; }
+
+        .input-box { 
+            display: flex; align-items: center; border: 1px solid var(--border); 
+            border-radius: 8px; background: #f8fafc; overflow: hidden; transition: 0.2s;
+        }
+        .input-box:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .input-box i { padding: 0 12px; color: #94a3b8; }
+        .input-box select, .input-box input { 
+            flex: 1; border: none; padding: 12px; outline: none; background: transparent; font-size: 14px; 
+            color: var(--text-main); width: 100%;
+        }
+        .input-box select:disabled, .input-box input:disabled { color: #94a3b8; cursor: not-allowed; background: #e2e8f0; }
+
+        .btn { 
+            width: 100%; padding: 14px; border: none; border-radius: 8px; 
+            background: var(--primary); color: white; font-weight: bold; font-size: 15px;
+            cursor: pointer; margin-top: 20px; transition: 0.3s; 
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn:hover { background: #1d4ed8; transform: translateY(-2px); }
+        .btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        #loading { text-align: center; color: var(--primary); font-weight: bold; margin-bottom: 15px; font-size: 14px;}
+        .hidden { display: none; }
+
+        /* NÚT CHUYỂN TRANG ADMIN */
+        .admin-link { margin-top: 25px; color: #64748b; font-size: 13px; cursor: pointer; transition: 0.2s; font-weight: 600;}
+        .admin-link:hover { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="logo">T<span>S</span></div>
+        <h2 id="school-title">Hệ Thống Ôn Tập Trực Tuyến</h2>
+
+        <div id="loading" class="hidden"><i class="fas fa-sync fa-spin"></i> Đang tải dữ liệu...</div>
+
+        <div id="login-form">
+            <div class="form-group">
+                <label>CHỌN TRƯỜNG</label>
+                <div class="input-box">
+                    <i class="fas fa-school"></i>
+                    <select id="slcSchool" onchange="loadSchoolData()">
+                        <option value="">-- Vui lòng chọn trường --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>CHỌN KHỐI</label>
+                <div class="input-box">
+                    <i class="fas fa-layer-group"></i>
+                    <select id="slcGrade" disabled onchange="loadClasses()">
+                        <option value="">-- Chọn Khối --</option>
+                        <option value="6">Khối 6</option>
+                        <option value="7">Khối 7</option>
+                        <option value="8">Khối 8</option>
+                        <option value="9">Khối 9</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>CHỌN LỚP</label>
+                <div class="input-box">
+                    <i class="fas fa-users"></i>
+                    <select id="slcClass" disabled onchange="loadStudents()">
+                        <option value="">-- Chọn Lớp --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>HỌ VÀ TÊN</label>
+                <div class="input-box">
+                    <i class="fas fa-user"></i>
+                    <select id="slcName" disabled onchange="checkSelection()">
+                        <option value="">-- Chọn Học Sinh --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="passArea" class="form-group hidden">
+                <label>MẬT KHẨU</label>
+                <div class="input-box">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="txtPass" placeholder="Nhập mật khẩu..." onkeypress="if(event.key === 'Enter') startExam()">
+                </div>
+            </div>
+
+            <button id="btnSubmit" class="btn" disabled onclick="startExam()">
+                ĐĂNG NHẬP <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="admin-link" onclick="window.location.href='admin.html'">
+        <i class="fa-solid fa-shield-halved"></i> Đăng nhập Quản trị viên
+    </div>
+
+    <script>
+        let dataHocSinh = [];
+
+        // 1. Tải danh sách trường từ config.js khi mở trang
+        window.onload = () => {
+            if (typeof CONFIG === 'undefined' || !CONFIG.SCHOOLS) {
+                document.getElementById('loading').innerHTML = "<i class='fa-solid fa-triangle-exclamation' style='color:red;'></i> Lỗi: Không tìm thấy file config.js hoặc thiếu cấu hình SCHOOLS!";
+                document.getElementById('loading').classList.remove('hidden');
+                return;
+            }
+
+            const slcSchool = document.getElementById('slcSchool');
+            for (const [key, schoolInfo] of Object.entries(CONFIG.SCHOOLS)) {
+                slcSchool.innerHTML += `<option value="${key}">${schoolInfo.name}</option>`;
+            }
+        };
+
+        // 2. Tải dữ liệu học sinh khi người dùng CHỌN TRƯỜNG
+        async function loadSchoolData() {
+            const schoolKey = document.getElementById('slcSchool').value;
+            const loadingDiv = document.getElementById('loading');
+            
+            resetForm();
+
+            if (!schoolKey) {
+                document.getElementById('school-title').innerText = "Hệ Thống Ôn Tập Trực Tuyến";
+                return;
+            }
+
+            const schoolInfo = CONFIG.SCHOOLS[schoolKey];
+            document.getElementById('school-title').innerText = schoolInfo.name.toUpperCase();
+
+            loadingDiv.innerHTML = '<i class="fas fa-sync fa-spin"></i> Đang tải dữ liệu trường...';
+            loadingDiv.classList.remove('hidden');
+
+            try {
+                const res = await fetch(schoolInfo.scriptUrl + "?action=getUsers");
+                const json = await res.json();
+                
+                if (json.status === "success") {
+                    dataHocSinh = json.data; 
+                    loadingDiv.classList.add('hidden'); 
+                    document.getElementById('slcGrade').disabled = false; 
+                } else {
+                    loadingDiv.innerHTML = "<i class='fa-solid fa-circle-xmark' style='color:red;'></i> Lỗi từ máy chủ: " + json.message;
+                }
+            } catch (e) {
+                loadingDiv.innerHTML = "<i class='fa-solid fa-wifi' style='color:red;'></i> Lỗi kết nối mạng hoặc sai đường dẫn Script!";
+                console.error(e);
+            }
+        }
+
+        // Hàm reset lại các ô chọn khi đổi trường
+        function resetForm() {
+            document.getElementById('slcGrade').value = "";
+            document.getElementById('slcGrade').disabled = true;
+            
+            document.getElementById('slcClass').innerHTML = '<option value="">-- Chọn Lớp --</option>';
+            document.getElementById('slcClass').disabled = true;
+
+            document.getElementById('slcName').innerHTML = '<option value="">-- Chọn Học Sinh --</option>';
+            document.getElementById('slcName').disabled = true;
+
+            document.getElementById('passArea').classList.add('hidden');
+            document.getElementById('txtPass').value = '';
+            document.getElementById('btnSubmit').disabled = true;
+        }
+
+        // 3. Lọc Lớp dựa trên Khối
+        function loadClasses() {
+            const grade = document.getElementById('slcGrade').value;
+            const slcClass = document.getElementById('slcClass');
+            const slcName = document.getElementById('slcName');
+            
+            slcClass.innerHTML = '<option value="">-- Chọn Lớp --</option>';
+            slcName.innerHTML = '<option value="">-- Chọn Học Sinh --</option>';
+            slcClass.disabled = true;
+            slcName.disabled = true;
+            document.getElementById('passArea').classList.add('hidden');
+            document.getElementById('txtPass').value = '';
+            document.getElementById('btnSubmit').disabled = true;
+
+            if(!grade) return;
+
+            const classes = [...new Set(dataHocSinh
+                .filter(row => String(row[2]).trim() === grade)
+                .map(row => String(row[3]).trim())
+            )].sort();
+
+            classes.forEach(c => {
+                slcClass.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+            slcClass.disabled = false;
+        }
+
+        // 4. Lọc Tên dựa trên Lớp
+        function loadStudents() {
+            const className = document.getElementById('slcClass').value;
+            const slcName = document.getElementById('slcName');
+            
+            slcName.innerHTML = '<option value="">-- Chọn Học Sinh --</option>';
+            document.getElementById('passArea').classList.add('hidden');
+            document.getElementById('txtPass').value = '';
+            document.getElementById('btnSubmit').disabled = true;
+
+            if(!className) { slcName.disabled = true; return; }
+
+            const students = dataHocSinh.filter(row => String(row[3]).trim() === className);
+            students.forEach(s => {
+                slcName.innerHTML += `<option value="${s[4]}" data-pass="${s[5]}" data-fullname="${s[1]}">${s[1]}</option>`;
+            });
+            slcName.disabled = false;
+        }
+
+        // 5. Hiển thị ô nhập mật khẩu khi đã chọn tên (Bỏ qua pass nếu là Thí sinh tự do)
+        function checkSelection() {
+            const val = document.getElementById('slcName').value;
+            const schoolKey = document.getElementById('slcSchool').value;
+
+            if(val) {
+                // NẾU LÀ THÍ SINH TỰ DO -> Ẩn ô Pass đi, mở khóa nút Đăng nhập luôn
+                if (schoolKey === 'thi_sinh_tu_do') {
+                    document.getElementById('passArea').classList.add('hidden');
+                    document.getElementById('txtPass').value = ''; // Xóa pass rác nếu có
+                    document.getElementById('btnSubmit').disabled = false;
+                } else {
+                    // Trường bình thường -> Hiện ô Pass, mở khóa nút Đăng nhập
+                    document.getElementById('passArea').classList.remove('hidden');
+                    document.getElementById('txtPass').focus();
+                    document.getElementById('btnSubmit').disabled = false;
+                }
+            } else {
+                document.getElementById('passArea').classList.add('hidden');
+                document.getElementById('btnSubmit').disabled = true;
+            }
+        }
+
+        // 6. Xử lý Đăng nhập Học Sinh
+        function startExam() {
+            const schoolKey = document.getElementById('slcSchool').value; 
+            const slcName = document.getElementById('slcName');
+            const enteredPass = document.getElementById('txtPass').value.trim();
+            const selectedOpt = slcName.options[slcName.selectedIndex];
+
+            // Nếu KHÔNG phải thí sinh tự do thì bắt buộc phải có mật khẩu
+            if(!schoolKey || !slcName.value || (schoolKey !== 'thi_sinh_tu_do' && !enteredPass)) {
+                alert("Vui lòng chọn đầy đủ trường, tên và nhập mật khẩu!");
+                return;
+            }
+
+            const correctPass = selectedOpt.getAttribute('data-pass');
+            const fullName = selectedOpt.getAttribute('data-fullname');
+            const grade = document.getElementById('slcGrade').value;
+            const className = document.getElementById('slcClass').value;
+
+            // Nếu là Thí sinh tự do HOẶC (Trường thường và nhập đúng pass) -> Vào thi
+            if(schoolKey === 'thi_sinh_tu_do' || enteredPass === String(correctPass).trim()) {
+                sessionStorage.setItem('exam_name', fullName);
+                sessionStorage.setItem('exam_class', className);
+                sessionStorage.setItem('exam_grade', grade);
+                sessionStorage.setItem('exam_school', schoolKey); 
+                sessionStorage.setItem('user_role', 'student');
+
+                // Nếu là Thí sinh tự do, set một cái pass fake ('no_pass') để không bị chặn đổi mật khẩu ở student.html
+                if (schoolKey === 'thi_sinh_tu_do') {
+                    sessionStorage.setItem('user_pass', 'no_pass');
+                } else {
+                    sessionStorage.setItem('user_pass', enteredPass);
+                }
+                
+                sessionStorage.setItem('login_username', slcName.value); 
+
+                window.location.href = "student.html"; 
+            } else {
+                alert("Mật khẩu không chính xác!");
+                document.getElementById('txtPass').value = '';
+                document.getElementById('txtPass').focus();
+            }
+        }
+    </script>
+</body>
+</html>

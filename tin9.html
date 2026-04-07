@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề kiểm tra cuối học kỳ II - Tin học 9</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="config.js"></script>
+
+    <style>
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --bg-color: #f1f5f9; --surface: #ffffff; --text-main: #0f172a; --border: #cbd5e1; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
+
+        .exam-layout { max-width: 1200px; margin: 0 auto; display: flex; gap: 25px; align-items: flex-start; }
+        .exam-main { flex: 1; min-width: 0; }
+        .exam-sidebar { width: 320px; flex-shrink: 0; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 20px; z-index: 100; }
+
+        /* GIAO DIỆN HEADER */
+        .classic-header { background: white; border: 1px solid var(--border); margin-bottom: 25px; font-family: 'Times New Roman', Times, serif; color: #000; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .classic-header-top { display: flex; flex-wrap: wrap; }
+        .classic-left { flex: 1.3; min-width: 300px; padding: 20px 25px; border-right: 1px solid var(--border); display: flex; flex-direction: column; gap: 18px; }
+        .classic-right { flex: 1; min-width: 250px; padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+        .classic-header-bottom { border-top: 1px solid var(--border); padding: 12px; text-align: center; font-style: italic; color: #475569; font-size: 16px; }
+        .info-line { display: flex; align-items: flex-end; gap: 8px; white-space: nowrap; font-size: 18px; font-weight: bold; }
+        .dotted-line { border-bottom: 2px dotted #000; flex: 1; color: var(--primary); font-weight: bold; padding: 0 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; font-size: 18px;}
+        .line-short { flex: 0.3; min-width: 60px; }
+        .exam-title { font-weight: bold; font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .exam-subject { font-weight: bold; font-size: 18px; text-transform: uppercase; }
+
+        .section-title { font-size: 16px; font-weight: bold; color: var(--surface); background: var(--primary); padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; text-transform: uppercase; }
+
+        .question-card { background: var(--surface); padding: 25px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid var(--border); transition: 0.2s ease; scroll-margin-top: 20px; }
+        .question-card:hover { border-color: #93c5fd; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .question-text { font-size: 16px; font-weight: 600; margin-bottom: 15px; line-height: 1.5; white-space: pre-wrap;}
+        .question-text span { color: var(--primary); }
+
+        .mcq-options { display: grid; gap: 10px; }
+        .grid-1 { grid-template-columns: 1fr; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+        .mcq-option { display: flex; align-items: center; padding: 12px 15px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: 0.2s; background: #f8fafc; height: 100%; box-sizing: border-box; font-size: 15px;}
+        .mcq-option:hover { background: #eff6ff; border-color: #bfdbfe; }
+        .mcq-option input[type="radio"] { margin-right: 12px; transform: scale(1.2); cursor: pointer; flex-shrink: 0; }
+
+        .tf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .tf-table th, .tf-table td { border: 1px solid var(--border); padding: 12px; text-align: center; }
+        .tf-table th { background: #f1f5f9; font-weight: 600; }
+        .tf-table .tf-text { text-align: left; font-size: 15px; }
+        .tf-radio { transform: scale(1.3); cursor: pointer; }
+        
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 14px; background: #fff;}
+        .data-table th, .data-table td { border: 1px solid #94a3b8; padding: 8px; text-align: center; }
+        .data-table th { background: #e2e8f0; font-weight: bold; }
+        .data-table td:nth-child(2), .data-table td:nth-child(3), .data-table td:nth-child(5) { text-align: left; }
+
+        .rte-container { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .rte-toolbar { background: #f1f5f9; padding: 8px; border-bottom: 1px solid var(--border); display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+        .rte-btn { background: white; border: 1px solid var(--border); padding: 6px 10px; border-radius: 4px; cursor: pointer; color: var(--text-main); font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;}
+        .rte-btn:hover { background: #e2e8f0; border-color: #94a3b8; color: var(--primary); }
+        .rte-btn select, .rte-btn input[type="color"] { border: none; background: transparent; cursor: pointer; outline: none; }
+        .rte-btn input[type="file"] { display: none; }
+        
+        .essay-box { width: 100%; min-height: 200px; padding: 15px; font-size: 15px; font-family: inherit; outline: none; box-sizing: border-box; background: white; overflow-y: auto; line-height: 1.6; }
+        .essay-box:focus { background: #fafafa; }
+        .essay-box img { max-width: 100%; height: auto; border-radius: 4px; margin: 5px 0; border: 1px solid #e2e8f0;}
+
+        .sidebar-box { background: var(--surface); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .timer-title { text-align: center; font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 8px;}
+        .timer-display { background: #eff6ff; color: var(--danger); padding: 15px; border-radius: 8px; font-size: 32px; font-weight: bold; text-align: center; border: 2px solid #bfdbfe; font-family: monospace; letter-spacing: 2px; }
+        .palette-title { font-size: 14px; font-weight: bold; margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 10px; }
+        .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 15px; }
+        .palette-btn { aspect-ratio: 1; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; font-weight: 600; font-size: 14px; color: var(--text-main); cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; padding: 0; }
+        .palette-btn:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff;}
+        .palette-btn.answered { background: var(--primary); color: white; border-color: var(--primary); }
+        .palette-legend { display: flex; justify-content: space-between; font-size: 12px; color: #64748b; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .box-color { width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--border); }
+        .box-color.done { background: var(--primary); border-color: var(--primary); }
+        .box-color.not-done { background: white; }
+
+        .btn-submit { width: 100%; background: var(--success); color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); text-transform: uppercase; }
+        .btn-submit:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4); }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(3px); }
+        .modal-content { background: white; width: 400px; max-width: 90%; border-radius: 12px; overflow: hidden; animation: slideDown 0.3s ease; box-shadow: 0 25px 50px rgba(0,0,0,0.2); text-align: center; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-body { padding: 30px 20px 20px; }
+        .modal-body i { font-size: 55px; color: var(--primary); margin-bottom: 15px; }
+        .modal-body h3 { margin: 0 0 10px; color: var(--text-main); font-size: 20px; text-transform: uppercase;}
+        .modal-body p { margin: 0; color: #475569; font-size: 15px; line-height: 1.5; }
+        .modal-footer { padding: 15px 20px; background: #f8fafc; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 10px; }
+        .btn-cancel { padding: 10px 20px; border: none; background: #94a3b8; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 14px;}
+        .btn-cancel:hover { background: #64748b; }
+        .btn-confirm { padding: 10px 20px; border: none; background: var(--primary); color: white; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 14px;}
+        .btn-confirm:hover { background: var(--primary-hover); }
+
+        /* TOAST */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { min-width: 250px; background: white; color: var(--text-main); padding: 15px 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px; animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; border-left: 4px solid var(--primary); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        .toast i { font-size: 20px; }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        .toast.warning i { color: var(--warning); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        @media (max-width: 992px) {
+            .exam-layout { flex-direction: column; }
+            .exam-sidebar { width: 100%; position: static; order: -1; }
+            .palette-grid { grid-template-columns: repeat(10, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .classic-left { border-right: none; border-bottom: 1px solid var(--border); }
+            .info-line { flex-wrap: wrap; }
+            .line-short { flex: 1; }
+            .palette-grid { grid-template-columns: repeat(7, 1fr); }
+            .grid-2 { grid-template-columns: 1fr; }
+            .tf-table th:nth-child(2), .tf-table th:nth-child(3) { width: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="exam-layout">
+    <div class="exam-main">
+        
+        <div class="classic-header">
+            <div class="classic-header-top">
+                <div class="classic-left">
+                    <div class="info-line">
+                        TRƯỜNG <span class="dotted-line" id="display-school">---</span>
+                    </div>
+                    <div class="info-line">
+                        Họ và tên: <span class="dotted-line" id="display-name">---</span>
+                        Lớp <span class="dotted-line line-short" id="display-class">---</span>
+                    </div>
+                </div>
+                <div class="classic-right">
+                    <div class="exam-title">ĐỀ KIỂM TRA CUỐI HỌC KỲ II<br>NĂM HỌC 2025-2026</div>
+                    <div class="exam-subject">MÔN: <span style="color: var(--primary);">TIN HỌC 9</span></div>
+                </div>
+            </div>
+            <div class="classic-header-bottom">
+                Thời gian làm bài: 45 phút (Không kể thời gian giao đề)
+            </div>
+        </div>
+
+        <div id="quiz-container"></div>
+    </div>
+
+    <div class="exam-sidebar">
+        <div class="sidebar-box">
+            <div class="timer-title">Thời gian làm bài</div>
+            <div class="timer-display" id="timer">45:00</div>
+        </div>
+
+        <div class="sidebar-box">
+            <div class="palette-title"><i class="fa-solid fa-table-cells-large"></i> BẢNG CÂU HỎI</div>
+            <div class="palette-grid" id="palette-container"></div>
+            <div class="palette-legend">
+                <div class="legend-item"><div class="box-color done"></div> Đã làm</div>
+                <div class="legend-item"><div class="box-color not-done"></div> Chưa làm</div>
+            </div>
+        </div>
+
+        <button class="btn-submit" id="btn-submit" onclick="openSubmitModal()"><i class="fa-solid fa-paper-plane"></i> Nộp bài thi</button>
+    </div>
+</div>
+
+<div id="submitModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-body">
+            <i class="fa-solid fa-circle-question"></i>
+            <h3>Xác nhận nộp bài</h3>
+            <p id="submit-msg">Bạn có chắc chắn muốn nộp bài thi?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeSubmitModal()">Quay lại làm tiếp</button>
+            <button class="btn-confirm" onclick="executeSubmit()"><i class="fa-solid fa-paper-plane"></i> Nộp bài ngay</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // 1. NGÂN HÀNG CÂU HỎI TỔNG HỢP (MCQ, TF, TỰ LUẬN)
+    // ==========================================
+    
+    // --- NGÂN HÀNG MCQ ---
+    const allMcqBank = [
+        { q: "Hàm COUNTIF có công dụng gì trong phần mềm bảng tính?", options: ["Tính tổng các giá trị.", "Đếm số ô thỏa mãn một điều kiện cho trước.", "Tìm giá trị lớn nhất.", "Sắp xếp dữ liệu."], correct: 1, cols: 2 },
+        { q: "Cú pháp cơ bản của hàm COUNTIF là gì?", options: ["COUNTIF(điều kiện, vùng dữ liệu)", "COUNTIF(vùng dữ liệu, điều kiện)", "COUNTIF(vùng dữ liệu, giá trị)", "COUNTIF(điều kiện)"], correct: 1, cols: 2 },
+        { q: "Trong công thức COUNTIF(B2:B10, \"Ăn uống\"), phần \"Ăn uống\" đóng vai trò gì?", options: ["Vùng dữ liệu cần đếm.", "Giá trị trả về của hàm.", "Điều kiện để đếm.", "Phạm vi tính toán."], correct: 2, cols: 2 },
+        { q: "Để đếm số lần xuất hiện của một khoản chi cụ thể trong một danh sách, hàm nào sau đây là phù hợp nhất?", options: ["SUMIF", "AVERAGEIF", "COUNTIF", "MAXIF"], correct: 2, cols: 2 },
+        { q: "Giả sử bạn có một bảng tính chi tiêu gia đình, cột B là các khoản chi. Khi bạn sử dụng hàm COUNTIF để đếm số lần chi tiêu cho khoản \"Ở\", kết quả nhận được cho biết điều gì?", options: ["Tổng số tiền đã chi cho khoản \"Ở\".", "Số lần bạn đã chi tiền cho khoản \"Ở\".", "Tỉ lệ phần trăm chi cho khoản \"Ở\" so với tổng chi.", "Giá trị lớn nhất đã chi cho khoản \"Ở\"."], correct: 1, cols: 1 },
+        { q: "Hàm SUMIF có công dụng gì trong phần mềm bảng tính?", options: ["Đếm số ô thỏa mãn điều kiện.", "Tính tổng tất cả các giá trị số.", "Tính tổng các giá trị thỏa mãn một điều kiện cho trước.", "Tìm giá trị nhỏ nhất trong một phạm vi."], correct: 2, cols: 1 },
+        { q: "Cú pháp cơ bản của hàm SUMIF là gì?", options: ["SUMIF(điều kiện, vùng tính tổng, vùng điều kiện)", "SUMIF(vùng điều kiện, điều kiện)", "SUMIF(vùng tính tổng, điều kiện)", "SUMIF(vùng điều kiện, điều kiện, vùng tính tổng)"], correct: 3, cols: 1 },
+        { q: "Trong công thức SUMIF($B$2:$B$10,G2,$D$2:$D$10), $D$2:$D$10 là thành phần nào của hàm SUMIF?", options: ["Vùng điều kiện.", "Điều kiện.", "Vùng tính tổng.", "Kết quả trả về."], correct: 2, cols: 2 },
+        { q: "Bạn muốn tính tổng số tiền chi tiêu cho khoản \"Đi lại\" trong bảng tính. Tại sao việc sử dụng hàm SUMIF hiệu quả hơn hàm SUM?", options: ["Hàm SUM chỉ tính được tổng một ô duy nhất.", "Hàm SUMIF tự động định dạng tiền tệ.", "Hàm SUMIF cho phép tính tổng dựa trên một điều kiện cụ thể, trong khi SUM tính tổng tất cả.", "Hàm SUM chỉ có thể cộng số nguyên, SUMIF có thể cộng số thập phân."], correct: 2, cols: 1 },
+        { q: "Hàm IF trong phần mềm bảng tính có công dụng gì?", options: ["Đếm số ô chứa văn bản.", "Thực hiện phép tính cộng.", "Trả về một giá trị nếu điều kiện là TRUE và một giá trị khác nếu điều kiện là FALSE.", "Sắp xếp dữ liệu theo thứ tự bảng chữ cái."], correct: 2, cols: 1 },
+        { q: "Cú pháp cơ bản của hàm IF là gì?", options: ["IF(giá_trị_nếu_đúng, giá_trị_nếu_sai, biểu_thức_logic)", "IF(biểu_thức_logic, giá_trị_nếu_đúng, giá_trị_nếu_sai)", "IF(biểu_thức_logic, giá_trị_nếu_đúng)", "IF(giá_trị_nếu_đúng, biểu_thức_logic)"], correct: 1, cols: 1 },
+        { q: "Trong cú pháp IF(biểu_thức_logic, giá_trị_nếu_đúng, giá_trị_nếu_sai), biểu_thức_logic là gì?", options: ["Giá trị mà hàm sẽ trả về nếu điều kiện đúng.", "Giá trị mà hàm sẽ trả về nếu điều kiện sai.", "Một điều kiện hoặc phép so sánh trả về TRUE hoặc FALSE.", "Tên của hàm logic."], correct: 2, cols: 1 },
+        { q: "Công thức =IF(N3>50%,\"Nhiều hơn\", \"Ít hơn\") có ý nghĩa gì khi áp dụng vào bảng tính quản lý tài chính?", options: ["Nếu N3 lớn hơn 50%, hiển thị \"Ít hơn\"; ngược lại hiển thị \"Nhiều hơn\".", "Nếu N3 lớn hơn 50%, hiển thị \"Nhiều hơn\"; ngược lại hiển thị \"Ít hơn\".", "Luôn hiển thị \"Nhiều hơn\" nếu N3 là số.", "Luôn hiển thị \"Ít hơn\" nếu N3 không phải là số."], correct: 1, cols: 1 },
+        { q: "Công thức =IF(N3>80%,\"Nhiều quá\",IF(N3>50%,\"Nhiều hơn\", \"Ít hơn\")) dùng để làm gì?", options: ["Chỉ kiểm tra nếu N3 lớn hơn 80%.", "Chỉ kiểm tra nếu N3 lớn hơn 50%.", "Đánh giá N3 theo nhiều mức độ điều kiện khác nhau và đưa ra nhận xét tương ứng.", "Luôn trả về \"Nhiều quá\" hoặc \"Ít hơn\"."], correct: 2, cols: 1 },
+        { q: "Để tham chiếu đến ô H7 của trang tính 'Thu nhập' từ một trang tính khác, công thức nào sau đây là đúng?", options: ["=H7@'Thu nhập'", "='Thu nhập'!H7", "=H7!Thu nhập", "=Thu nhập.H7"], correct: 1, cols: 2 },
+        { q: "Khi tham chiếu dữ liệu từ các trang tính khác, phần nào trong công thức 'Tên trang tính'!Địa chỉ ô dùng để xác định vị trí dữ liệu?", options: ["Chỉ 'Tên trang tính'.", "Chỉ 'Địa chỉ ô'.", "Cả 'Tên trang tính' và 'Địa chỉ ô'.", "Dấu chấm than (!)."], correct: 2, cols: 2 },
+        { q: "Khi nhập điều kiện là kí tự chữ hoặc biểu thức so sánh trong hàm COUNTIF, ta phải đặt điều kiện đó trong dấu gì?", options: ["Ngoặc đơn ( )", "Ngoặc vuông [ ]", "Ngoặc kép \" \"", "Không cần dấu gì"], correct: 2, cols: 1 },
+        { q: "Trong Excel, phép so sánh 'khác nhau' (không bằng) được kí hiệu như thế nào?", options: ["!=", "<>", "><", "NOT="], correct: 1, cols: 2 },
+        { q: "Trong bảng tổng hợp thu chi, chỉ số NET (Số dư) được hiểu là gì?", options: ["Tổng số tiền thu nhập", "Tổng số tiền đã chi tiêu", "Phần tiền còn lại (Tổng thu nhập trừ đi Tổng chi tiêu)", "Tiền nợ ngân hàng"], correct: 2, cols: 1 }
+    ];
+
+    // --- NGÂN HÀNG ĐÚNG/SAI ---
+    const tableHTML = `
+        <div style="margin-top: 10px; font-weight: normal; color: #475569;">
+            <i>Quan sát bảng số liệu sau đây và trả lời các ý bên dưới:</i>
+            <table class="data-table">
+                <tr><th>STT</th><th>KHOẢN CHI</th><th>MỤC CHI TIẾT</th><th>SỐ TIỀN</th><th>GHI CHÚ</th></tr>
+                <tr><td>1</td><td>Ở</td><td>Tiền điện</td><td>800</td><td></td></tr>
+                <tr><td>2</td><td>Ở</td><td>Tiền nước</td><td>120</td><td></td></tr>
+                <tr><td>3</td><td>Ăn uống</td><td>Đi siêu thị</td><td>600000</td><td>(Mức chi > 500.000)</td></tr>
+                <tr><td>4</td><td>Đi lại</td><td>Đổ xăng máy</td><td>50000</td><td></td></tr>
+                <tr><td>5</td><td>Ở</td><td>Tiền điện</td><td>120</td><td></td></tr>
+                <tr><td>6</td><td>Ăn uống</td><td>Ăn sáng</td><td>30000</td><td></td></tr>
+                <tr><td>7</td><td>Đi lại</td><td>Tiền nước</td><td>50000</td><td></td></tr>
+                <tr><td>8</td><td>Ở</td><td>Đi siêu thị</td><td>110</td><td></td></tr>
+                <tr><td>9</td><td>Ăn uống</td><td>Đổ xăng máy</td><td>900</td><td></td></tr>
+            </table>
+        </div>
+    `;
+
+    const allTfBank = [
+        { title: `Bạn đang quản lý chi tiêu gia đình bằng bảng tính Excel. Cột "Khoản chi" nằm ở cột B (từ B2 đến B10) và chứa các mục như "Ăn uống", "Ở", "Đi lại". ${tableHTML}`, items: [
+            { text: "a) Hàm COUNTIF dùng để tính tổng số tiền chi tiêu.", ans: "S" },
+            { text: "b) Cú pháp cơ bản của hàm COUNTIF là COUNTIF(vùng dữ liệu, điều kiện).", ans: "D" },
+            { text: "c) Để đếm số lần chi tiêu cho khoản \"Ở\" trong cột B từ B2 đến B10, công thức COUNTIF(B2:B10, \"Ở\") sẽ trả về kết quả đúng.", ans: "D" },
+            { text: "d) Nếu muốn đếm số lần chi tiêu có giá trị lớn hơn 500.000đ trong cột \"Số tiền\" (từ D2 đến D10), có thể dùng công thức COUNTIF(D2:D10, \">500000\").", ans: "D" }
+        ]},
+        { title: "Để tổng hợp số tiền chi tiêu theo từng khoản, bạn cần sử dụng hàm phù hợp. Giả sử cột \"Khoản chi\" từ B2 đến B10 và cột \"Số tiền\" từ D2 đến D10.", items: [
+            { text: "a) Hàm SUMIF dùng để tính tổng các giá trị thỏa mãn một điều kiện cho trước.", ans: "D" },
+            { text: "b) Cú pháp của hàm SUMIF bao gồm ba đối số: SUMIF(vùng điều kiện, điều kiện, vùng tính tổng).", ans: "D" },
+            { text: "c) Hàm SUM chỉ có thể tính tổng các ô chứa số đơn thuần, trong khi SUMIF có thể tính tổng các ô chứa số dựa trên điều kiện của các ô khác.", ans: "D" },
+            { text: "d) Nếu ô H2 hiển thị 920 là tổng tiền cho khoản \"Ở\" từ dữ liệu cột Khoản chi (B) và cột Số tiền (D), điều đó có nghĩa là hàm SUMIF đã hoạt động đúng khi tổng hợp các mục chi \"Ở\" từ hai mục tiền điện 800 và tiền nước 120.", ans: "S" }
+        ]},
+        { title: "Bạn muốn đưa ra nhận xét về tình hình chi tiêu dựa trên tỉ lệ phần trăm chi so với tổng thu nhập.", items: [
+            { text: "a) Hàm IF là một hàm logic trả về giá trị TRUE hoặc FALSE.", ans: "S" },
+            { text: "b) Ba thành phần bắt buộc của hàm IF là biểu thức logic, giá trị nếu đúng, và giá trị nếu sai.", ans: "S" },
+            { text: "c) Công thức `=IF(N3>50%,\"Nhiều hơn\", \"Ít hơn\")` có nghĩa là nếu tỉ lệ chi tại ô N3 lớn hơn 50% thì nhận xét là \"Nhiều hơn\", ngược lại là \"Ít hơn\".", ans: "D" },
+            { text: "d) Để xác định tỉ lệ thưởng là 5% nếu doanh thu (ô B2) trên 10 triệu và 0% nếu không, công thức `=IF(B2>10000000, 5%, 0%)` là chính xác.", ans: "D" }
+        ]},
+        { title: "Bạn đang hoàn thiện bảng tính quản lý tài chính gia đình và muốn đánh giá chi tiêu chi tiết hơn, đồng thời tham chiếu dữ liệu từ các trang tính khác.", items: [
+            { text: "a) Để lấy tổng thu nhập từ ô H7 của trang tính 'Thu nhập' vào ô B14 của trang tính 'Tổng hợp', công thức đúng là 'Thu nhập'!H7.", ans: "S" },
+            { text: "b) Việc tạo trang tính tổng hợp dữ liệu tài chính gia đình giúp người dùng có cái nhìn tổng quát về thu chi, cân đối tài chính dễ dàng hơn so với việc xem từng trang tính riêng lẻ.", ans: "D" },
+            { text: "c) Để đưa ra nhận xét \"Nhiều quá\" (nếu N3>80%), \"Nhiều hơn\" (nếu N3>50%) hoặc \"Ít hơn\", công thức =IF(N3>80%,\"Nhiều quá\",IF(N3>50%,\"Nhiều hơn\", \"Ít hơn\")) là chính xác.", ans: "D" },
+            { text: "d) Để tính tổng số tiền cho khoản \"Ăn uống\" trong cột D từ D2 đến D10, với điều kiện khoản chi ở cột B từ B2 đến B10 là \"Ăn uống\", công thức =SUMIF(B2:B10,\"Ăn uống\",D2:D10) là đúng.", ans: "D" }
+        ]},
+        { title: "Cú pháp và ý nghĩa của các hàm quản lý tài chính cơ bản:", items: [
+            { text: "a) Hàm COUNTIF dùng để tính tổng các ô chứa số liệu.", ans: "S" },
+            { text: "b) Dấu hiệu của việc thâm hụt tài chính là Số dư (NET) mang giá trị âm.", ans: "D" },
+            { text: "c) Việc liên kết dữ liệu giúp bảng tổng hợp tự động thay đổi kết quả khi dữ liệu gốc thay đổi.", ans: "D" },
+            { text: "d) Lỗi #VALUE! thường xuất hiện khi ta gõ sai tên hàm SUMIF.", ans: "S" }
+        ]}
+    ];
+
+    // --- NGÂN HÀNG TỰ LUẬN (Kết hợp thực hành và lý thuyết) ---
+    const allEssayBank = [
+        { text: "Dựa vào bảng dữ liệu chi tiêu đã quan sát ở Phần II, em hãy ghi lại cú pháp hàm SUMIF để tính tổng số tiền chi cho khoản \"Đi lại\". Giả sử cột Khoản chi là B2:B10 và cột Số tiền là D2:D10. (1.0 điểm)" },
+        { text: "Giải thích ý nghĩa của công thức sau: =IF(E5 > F5, 'Vượt định mức', 'Trong định mức'). Nếu E5=100 và F5=100 thì kết quả trả về là gì? (1.0 điểm)" },
+        { text: "Trình bày các bước thao tác để tạo một công thức tham chiếu dữ liệu từ ô B5 của trang tính 'Thu_nhap' sang ô C3 của trang tính 'Tong_hop'? Việc tham chiếu này mang lại lợi ích gì cho việc quản lý tài chính? (1.0 điểm)" },
+        { text: "Giả sử ô D10 chứa 'Tổng thu nhập' và ô E10 chứa 'Tổng chi tiêu'. Hãy viết công thức tính 'Số dư' (NET) tại ô F10. Nếu số dư (NET) bị âm, điều đó phản ánh tình trạng tài chính của gia đình như thế nào? (1.0 điểm)" },
+        { text: "Hàm IF lồng nhau là gì? Hãy viết một công thức sử dụng hàm IF lồng nhau để xếp loại chi tiêu: Nếu số tiền > 5000 thì 'Cao', nếu > 2000 thì 'Trung bình', còn lại 'Thấp' (giả sử số tiền ở ô C2). (1.0 điểm)" }
+    ];
+
+    // ==========================================
+    // 2. THUẬT TOÁN XÁO TRỘN & BỐC ĐỀ CHUẨN MA TRẬN
+    // ==========================================
+    function shuffleArray(array) {
+        let curId = array.length;
+        while (0 !== curId) {
+            let randId = Math.floor(Math.random() * curId);
+            curId -= 1;
+            let tmp = array[curId]; array[curId] = array[randId]; array[randId] = tmp;
+        }
+        return array;
+    }
+
+    let selectedMcq = [], selectedTf = [], selectedEssay = [];
+
+    function generateRandomExam() {
+        // Lấy 12 câu Trắc nghiệm khách quan
+        selectedMcq = shuffleArray([...allMcqBank]).slice(0, 12);
+        selectedMcq.forEach(q => {
+            let optsWithStatus = q.options.map((text, idx) => ({ text: text, isCorrect: (idx === q.correct) }));
+            optsWithStatus = shuffleArray(optsWithStatus);
+            q.options = optsWithStatus.map(o => o.text);
+            q.correct = optsWithStatus.findIndex(o => o.isCorrect); 
+        });
+
+        // Lấy 4 câu Đúng/Sai
+        selectedTf = shuffleArray([...allTfBank]).slice(0, 4);
+
+        // Lấy 3 câu Tự luận
+        selectedEssay = shuffleArray([...allEssayBank]).slice(0, 3).map(e => e.text); 
+    }
+
+    // ==========================================
+    // 3. GIAO DIỆN & HOẠT ĐỘNG CHUNG
+    // ==========================================
+    let timeStart = new Date();
+    let duration = 45 * 60; // 45 phút
+    let timerInterval;
+
+    function encodeUTF8(str) { return btoa(unescape(encodeURIComponent(str || ""))); }
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        let icon = '<i class="fa-solid fa-circle-check"></i>';
+        if (type === 'error') icon = '<i class="fa-solid fa-circle-exclamation"></i>';
+        if (type === 'warning') icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 3000);
+    }
+
+    window.onload = function() {
+        const studentName = sessionStorage.getItem('exam_name') || "Thí sinh tự do";
+        const studentClass = sessionStorage.getItem('exam_class') || "---";
+
+        const schoolKey = sessionStorage.getItem('exam_school');
+        let schoolName = "Chưa cập nhật";
+        if (typeof CONFIG !== 'undefined' && schoolKey && CONFIG.SCHOOLS[schoolKey]) {
+            schoolName = CONFIG.SCHOOLS[schoolKey].name;
+        }
+
+        document.getElementById('display-name').innerText = studentName;
+        document.getElementById('display-school').innerText = schoolName.toUpperCase();
+        document.getElementById('display-class').innerText = studentClass;
+
+        generateRandomExam(); 
+        renderExam();
+        renderPalette(); 
+        startTimer();
+    };
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            duration--;
+            let m = Math.floor(duration / 60);
+            let s = duration % 60;
+            document.getElementById('timer').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (duration <= 0) {
+                clearInterval(timerInterval);
+                closeSubmitModal();
+                showToast("Đã hết thời gian làm bài! Hệ thống đang tự động nộp bài...", "warning");
+                executeSubmit();
+            }
+        }, 1000);
+    }
+
+    function renderExam() {
+        const container = document.getElementById('quiz-container');
+        let html = "";
+        let globalQIndex = 1; 
+
+        // MCQ (12 câu - 3.0đ)
+        html += `<div class="section-title">I. PHẦN TRẮC NGHIỆM NHIỀU LỰA CHỌN (3.0 ĐIỂM)</div>`;
+        selectedMcq.forEach((q, index) => {
+            let gridClass = q.cols === 2 ? "grid-2" : "grid-1";
+            html += `
+            <div class="question-card" id="q-${globalQIndex}">
+                <div class="question-text"><span>Câu ${globalQIndex}:</span> ${q.q}</div>
+                <div class="mcq-options ${gridClass}">`;
+            q.options.forEach((opt, optIndex) => {
+                let letter = ["A", "B", "C", "D"][optIndex];
+                html += `
+                    <label class="mcq-option">
+                        <input type="radio" name="mcq_${index}" value="${optIndex}" onchange="markAnswered(${globalQIndex})">
+                        <b>${letter}.</b> &nbsp;${opt}
+                    </label>`;
+            });
+            html += `</div></div>`;
+            globalQIndex++;
+        });
+
+        // T/F (4 câu - 4.0đ)
+        html += `<div class="section-title" style="margin-top: 30px;">II. PHẦN TRẮC NGHIỆM ĐÚNG/SAI (4.0 ĐIỂM)</div>`;
+        selectedTf.forEach((q, qIndex) => {
+            html += `
+            <div class="question-card" id="q-${globalQIndex}">
+                <div class="question-text"><span>Câu ${globalQIndex}:</span> ${q.title}</div>
+                <table class="tf-table">
+                    <tr>
+                        <th class="tf-text">Nội dung ý</th>
+                        <th style="width: 60px;">ĐÚNG</th>
+                        <th style="width: 60px;">SAI</th>
+                    </tr>`;
+            q.items.forEach((item, iIndex) => {
+                html += `
+                    <tr>
+                        <td class="tf-text">${item.text}</td>
+                        <td><input type="radio" name="tf_${qIndex}_${iIndex}" value="D" class="tf-radio" onchange="markAnswered(${globalQIndex})"></td>
+                        <td><input type="radio" name="tf_${qIndex}_${iIndex}" value="S" class="tf-radio" onchange="markAnswered(${globalQIndex})"></td>
+                    </tr>`;
+            });
+            html += `</table></div>`;
+            globalQIndex++;
+        });
+
+        // ESSAY (3 câu - 3.0đ)
+        html += `<div class="section-title" style="margin-top: 30px;">III. PHẦN TỰ LUẬN (3.0 ĐIỂM)</div>`;
+        selectedEssay.forEach((qText, index) => {
+            html += `
+            <div class="question-card" id="q-${globalQIndex}">
+                <div class="question-text"><span>Câu ${globalQIndex}:</span><br>${qText}</div>
+                <div class="rte-container">
+                    <div class="rte-toolbar">
+                        <button class="rte-btn" type="button" title="In đậm" onclick="execCmd('bold', '${index}')"><i class="fa-solid fa-bold"></i></button>
+                        <button class="rte-btn" type="button" title="In nghiêng" onclick="execCmd('italic', '${index}')"><i class="fa-solid fa-italic"></i></button>
+                        <button class="rte-btn" type="button" title="Gạch chân" onclick="execCmd('underline', '${index}')"><i class="fa-solid fa-underline"></i></button>
+                        <div class="rte-btn" title="Màu chữ">
+                            <i class="fa-solid fa-palette"></i>
+                            <input type="color" onchange="execCmd('foreColor', '${index}', this.value)">
+                        </div>
+                        <div class="rte-btn" title="Cỡ chữ">
+                            <i class="fa-solid fa-text-height"></i>
+                            <select onchange="execCmd('fontSize', '${index}', this.value)">
+                                <option value="3">Vừa</option>
+                                <option value="5">Lớn</option>
+                                <option value="7">Rất lớn</option>
+                            </select>
+                        </div>
+                        <label class="rte-btn" title="Chụp ảnh / Chọn ảnh từ máy">
+                            <i class="fa-solid fa-camera"></i> Đính kèm ảnh
+                            <input type="file" accept="image/*" capture="environment" onchange="insertImage(this, '${index}', ${globalQIndex})">
+                        </label>
+                    </div>
+                    <div class="essay-box" id="essay_${index}" contenteditable="true" placeholder="Nhập câu trả lời của em vào đây..." oninput="markAnswered(${globalQIndex}, this.innerHTML)"></div>
+                </div>
+            </div>`;
+            globalQIndex++;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function renderPalette() {
+        const paletteContainer = document.getElementById('palette-container');
+        let html = "";
+        let totalQuestions = selectedMcq.length + selectedTf.length + selectedEssay.length;
+        for (let i = 1; i <= totalQuestions; i++) {
+            html += `<button class="palette-btn" id="pal-${i}" onclick="scrollToQ(${i})">${i}</button>`;
+        }
+        paletteContainer.innerHTML = html;
+    }
+
+    function scrollToQ(qId) { document.getElementById(`q-${qId}`).scrollIntoView({ behavior: "smooth", block: "center" }); }
+
+    function markAnswered(qId, textValue = true) {
+        const btn = document.getElementById(`pal-${qId}`);
+        if (typeof textValue === 'string') {
+            let tempDiv = document.createElement('div'); tempDiv.innerHTML = textValue;
+            if (tempDiv.textContent.trim() !== "" || textValue.includes("<img")) btn.classList.add("answered");
+            else btn.classList.remove("answered");
+        } else btn.classList.add("answered");
+    }
+
+    function execCmd(command, essayIndex, value = null) {
+        document.getElementById(`essay_${essayIndex}`).focus(); document.execCommand(command, false, value);
+    }
+
+    function insertImage(input, essayIndex, globalQIndex) {
+        const file = input.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width; let height = img.height;
+                if (width > 800) { height = Math.round(height * (800 / width)); width = 800; }
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                document.getElementById(`essay_${essayIndex}`).focus();
+                document.execCommand('insertImage', false, dataUrl);
+                markAnswered(globalQIndex, "image_added");
+            }
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
+    function openSubmitModal() {
+        const unanswered = document.querySelectorAll('.palette-btn:not(.answered)').length;
+        const msgEl = document.getElementById('submit-msg');
+        if (unanswered > 0) {
+            msgEl.innerHTML = `Bạn còn <b style="color:var(--danger);">${unanswered} câu chưa làm</b>.<br>Bạn có chắc chắn muốn nộp bài thi?`;
+        } else {
+            msgEl.innerText = "Bạn đã hoàn thành tất cả câu hỏi. Xác nhận nộp bài thi?";
+        }
+        document.getElementById('submitModal').style.display = 'flex';
+    }
+
+    function closeSubmitModal() {
+        document.getElementById('submitModal').style.display = 'none';
+    }
+
+    function executeSubmit() {
+        closeSubmitModal();
+        clearInterval(timerInterval);
+        
+        const btn = document.getElementById('btn-submit');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang nộp bài...';
+        btn.disabled = true;
+
+        // --- CẬP NHẬT: LẤY ĐÚNG LINK SCRIPT CỦA TRƯỜNG TỪ CONFIG ---
+        const schoolKey = sessionStorage.getItem('exam_school');
+        if (typeof CONFIG === 'undefined' || !CONFIG.SCHOOLS[schoolKey] || !CONFIG.SCHOOLS[schoolKey].scriptUrl) {
+            showToast("Lỗi hệ thống: Không tìm thấy máy chủ dữ liệu của trường!", "error");
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> NỘP LẠI';
+            btn.disabled = false;
+            return;
+        }
+        const scriptUrl = CONFIG.SCHOOLS[schoolKey].scriptUrl;
+        const schoolName = CONFIG.SCHOOLS[schoolKey].name;
+
+        let scoreMCQ = 0; 
+        let scoreTF = 0; 
+        let answersCodeArray = []; 
+
+        // 1. Chấm điểm MCQ
+        let mcqAnsStr = "";
+        selectedMcq.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="mcq_${index}"]:checked`);
+            let userAns = selected ? parseInt(selected.value) : -1;
+            let letterAns = userAns > -1 ? ["A", "B", "C", "D"][userAns] : "X";
+            if (userAns === q.correct) scoreMCQ += 0.25;
+            mcqAnsStr += `C${index + 1}${letterAns}-`;
+        });
+        answersCodeArray.push(mcqAnsStr.slice(0, -1));
+
+        // 2. Chấm điểm T/F
+        let tfAnsStr = "";
+        selectedTf.forEach((q, qIndex) => {
+            q.items.forEach((item, iIndex) => {
+                const selected = document.querySelector(`input[name="tf_${qIndex}_${iIndex}"]:checked`);
+                const userAns = selected ? selected.value : "X";
+                const qNum = qIndex + 13; 
+                const letter = ["a", "b", "c", "d"][iIndex];
+                if (userAns === item.ans) scoreTF += 0.25;
+                tfAnsStr += `C${qNum}${letter}${userAns}-`;
+            });
+        });
+        answersCodeArray.push(tfAnsStr.slice(0, -1));
+
+        // 3. Gom Tự luận
+        let essayEncodedStr = "";   
+        let essayPlainForSheet = ""; 
+        
+        selectedEssay.forEach((qText, index) => {
+            let htmlAns = document.getElementById(`essay_${index}`).innerHTML.trim();
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlAns;
+            let plainText = tempDiv.textContent.trim();
+
+            if(plainText === "" && !htmlAns.includes("<img")) {
+                htmlAns = "";
+                plainText = "(Không trả lời)";
+            }
+
+            essayPlainForSheet += `Câu ${index + 17}:\n${plainText}\n\n`;
+            let base64Ans = htmlAns ? encodeUTF8(htmlAns) : "X";
+            essayEncodedStr += `C${index + 17}:${base64Ans}-`; 
+        });
+
+        let totalScore = scoreMCQ + scoreTF; 
+        const timeEnd = new Date();
+        const timeTaken = Math.floor((timeEnd - timeStart) / 1000);
+        let timeTakenStr = `${Math.floor(timeTaken / 60)} phút ${timeTaken % 60} giây`;
+        let deviceInfo = /Mobi|Android/i.test(navigator.userAgent) ? "Điện thoại/Tablet" : "Máy tính";
+
+        // 4. CHUẨN BỊ PAYLOAD
+        const payload = {
+            action: "submitExam",
+            timeStart: timeStart.toLocaleTimeString('vi-VN'),
+            timeEnd: timeEnd.toLocaleTimeString('vi-VN'),
+            timeTaken: timeTakenStr,
+            name: sessionStorage.getItem('exam_name') || "Không tên",
+            className: sessionStorage.getItem('exam_class') || "0",
+            school: schoolName, // Sử dụng tên trường từ config.js
+            deviceInfo: deviceInfo,
+            location: "Chờ cấp quyền",
+            scoreTNLQ: scoreMCQ.toFixed(2),
+            scoreTF: scoreTF.toFixed(2),
+            scoreShort: 0,
+            essay: essayPlainForSheet.trim(),       
+            correct: "---",
+            totalScore: totalScore.toFixed(2),
+            detailCode: answersCodeArray.join('*'), 
+            encodedEssay: essayEncodedStr.slice(0, -1) 
+        };
+
+        // GỬI LÊN APPS SCRIPT CỦA TRƯỜNG TƯƠNG ỨNG
+        fetch(scriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            sessionStorage.setItem('report_time', timeTakenStr);
+            sessionStorage.setItem('report_score_tn', totalScore.toFixed(2));
+            sessionStorage.setItem('report_subject', 'Tin học 9'); 
+            
+            let mcqReportQ = "<tr>", mcqReportA = "<tr>", mcqReportQ2 = "<tr>", mcqReportA2 = "<tr>"; 
+            selectedMcq.forEach((q, i) => {
+                const selected = document.querySelector(`input[name="mcq_${i}"]:checked`);
+                let userAns = selected ? ["A","B","C","D"][parseInt(selected.value)] : "";
+                if (i < 10) { mcqReportQ += `<th>C.${i+1}</th>`; mcqReportA += `<td>${userAns}</td>`; }
+                else { mcqReportQ2 += `<th>C.${i+1}</th>`; mcqReportA2 += `<td>${userAns}</td>`; }
+            });
+            sessionStorage.setItem('report_mcq', mcqReportQ + "</tr>" + mcqReportA + "</tr>" + mcqReportQ2 + "</tr>" + mcqReportA2 + "</tr>");
+
+            let tfReportHtml = "<tr><th>Câu</th><th>Ý a</th><th>Ý b</th><th>Ý c</th><th>Ý d</th></tr>";
+            selectedTf.forEach((q, qIndex) => {
+                let row = `<tr><td><b>Câu ${qIndex + 13}</b></td>`;
+                q.items.forEach((item, iIndex) => {
+                    const selected = document.querySelector(`input[name="tf_${qIndex}_${iIndex}"]:checked`);
+                    let userAns = selected ? selected.value : "";
+                    row += `<td>${userAns === 'D' ? 'Đ' : (userAns === 'S' ? 'S' : '')}</td>`;
+                });
+                tfReportHtml += row + "</tr>";
+            });
+            sessionStorage.setItem('report_tf', tfReportHtml);
+
+            let essayReportHtml = "";
+            selectedEssay.forEach((qText, i) => {
+                let htmlAns = document.getElementById(`essay_${i}`).innerHTML.trim();
+                let tempDiv = document.createElement('div'); tempDiv.innerHTML = htmlAns;
+                if(tempDiv.textContent.trim() === "" && !htmlAns.includes("<img")) htmlAns = "<i>(Bỏ trống)</i>";
+                essayReportHtml += `
+                <div class="essay-item" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc;">
+                    <b style="color: #2563eb;">Câu ${i + 17}:</b><br>
+                    <div style="margin-top: 5px;"><b>Trả lời:</b><br>${htmlAns}</div>
+                </div>`;
+            });
+            sessionStorage.setItem('report_essay', essayReportHtml);
+
+            window.location.href = "Report_hs.html";
+        }).catch(err => {
+            console.error(err);
+            showToast("Lỗi mạng! Vui lòng thử bấm nộp bài lại.", "error");
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> GỬI LẠI';
+            btn.disabled = false;
+        });
+    }
+</script>
+
+</body>
+</html>

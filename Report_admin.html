@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Bài Làm - Quản Trị Giáo Viên</title>
+    <script src="config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; max-width: 100%; }
+        :root { --primary: #0ea5e9; --text-dark: #1e293b; --border: #000000; --bg: #f1f5f9; --danger: #e11d48; --success: #10b981; }
+        
+        body { font-family: 'Times New Roman', Times, serif; background: var(--bg); margin: 0; padding: 20px; color: #000; display: flex; flex-direction: column; align-items: center; }
+        
+        .action-bar { width: 100%; max-width: 1000px; margin-bottom: 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        
+        .btn { padding: 10px 14px; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;}
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 8px -1px rgba(0,0,0,0.15); filter: brightness(1.1);}
+        .btn:disabled { background: #94a3b8 !important; cursor: not-allowed !important; opacity: 0.8; transform: none; box-shadow: none;}
+        .hidden { display: none !important; }
+        
+        #report-content { background: white; width: 794px; min-height: 1122px; padding: 12mm 15mm 12mm 25mm; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border-radius: 4px; margin: 0 auto; line-height: 1.3; position: relative;}
+        .header-top { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 12pt; font-weight: bold; }
+        .header-top p { margin: 4px 0; } 
+        .header-left { width: 45%; text-align: left; }
+        .header-right { width: 50%; text-align: center; }
+        
+        .student-info { font-size: 13pt; margin-bottom: 20px; margin-top: 20px; padding-bottom: 10px;}
+        .student-info p { margin: 6px 0; } 
+        .dynamic-data { font-weight: bold; padding: 0 5px; color: #000; }
+        
+        .report-title { text-align: center; margin: 20px 0; }
+        .report-title h1 { font-size: 16pt; font-weight: bold; text-transform: uppercase; margin: 0; letter-spacing: 1px;}
+        
+        .score-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 25px; border: 2px solid var(--border); }
+        .score-table th, .score-table td { border: 1px solid var(--border); padding: 12px; text-align: center; font-size: 13pt; }
+        .score-table th { background-color: #f8fafc; }
+        .score-val { font-size: 16pt; font-weight: bold; color: var(--danger); }
+        .score-essay { font-size: 16pt; font-weight: bold; color: var(--success); } 
+        
+        .section-title { font-size: 13pt; font-weight: bold; margin: 20px 0 10px 0; text-transform: uppercase; padding-bottom: 3px;}
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed; } 
+        .data-table th, .data-table td { border: 1px solid var(--border); padding: 6px; text-align: center; font-size: 12pt; word-break: break-word; }
+        .data-table th { background: #f8fafc; font-weight: bold; }
+        
+        .essay-box { margin-bottom: 20px; padding-bottom: 15px; font-size: 13pt; border-bottom: 1px dashed #94a3b8; }
+        .essay-box-title { font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .essay-score-label { color: var(--danger); font-size: 14pt; font-weight: bold; border: 1px solid var(--danger); padding: 2px 8px; border-radius: 4px; background: #fff1f2;}
+        .essay-box-content { margin-left: 15px; color: #000; font-family: inherit; white-space: pre-wrap; font-style: normal; line-height: 1.4; text-align: justify;}
+        .essay-box-content img { max-width: 100%; height: auto; border: 1px solid #e2e8f0; border-radius: 4px; margin-top: 10px; display: block;}
+        .avoid-break { page-break-inside: avoid !important; }
+
+        /* MODAL CHẤM ĐIỂM */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); display: flex; justify-content: center; align-items: center; z-index: 1000; font-family: 'Segoe UI', Tahoma, sans-serif; backdrop-filter: blur(3px); opacity: 0; visibility: hidden; transition: 0.2s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: white; width: 900px; max-width: 95%; max-height: 90vh; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); transform: scale(0.95); transition: 0.3s ease;}
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-radius: 12px 12px 0 0; }
+        .modal-header h2 { margin: 0; color: var(--primary); font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;}
+        .close-btn { background: transparent; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; transition: 0.2s;}
+        .close-btn:hover { color: var(--danger); transform: rotate(90deg);}
+        .modal-body { padding: 0; overflow-y: auto; flex: 1; background: #f1f5f9;}
+        .grading-table { width: 100%; border-collapse: collapse; font-size: 15px; background: white;}
+        .grading-table th, .grading-table td { border-bottom: 1px solid #e2e8f0; padding: 15px 20px; text-align: left; vertical-align: top; }
+        .grading-table th { background: #e0f2fe; color: #0369a1; text-align: center; position: sticky; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 10; text-transform: uppercase; font-size: 13px;}
+        .grading-table td:first-child { font-weight: bold; text-align: center; width: 100px; color: var(--primary); font-size: 16px;}
+        .grading-table td:last-child { width: 140px; text-align: center; background: #f8fafc;}
+        .grade-input { width: 90px; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; text-align: center; font-weight: 800; font-size: 18px; color: var(--success); outline: none; transition: 0.2s; background: white; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
+        .grade-input:focus { border-color: var(--success); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+        .grade-input:disabled { background: #f8fafc; color: #94a3b8; border-color: #e2e8f0; cursor: not-allowed; box-shadow: none; opacity: 0.8; }
+        
+        .modal-footer { padding: 15px 25px; border-top: 1px solid #e2e8f0; text-align: right; background: white; border-radius: 0 0 12px 12px; display: flex; justify-content: flex-end; gap: 10px;}
+
+        /* TOAST NOTIFICATION */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; font-family: 'Segoe UI', Tahoma, sans-serif;}
+        .toast { min-width: 250px; background: white; color: var(--text-dark); padding: 15px 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px; animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; border-left: 4px solid var(--primary); }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success i { color: var(--success); font-size: 18px;}
+        .toast.error i { color: var(--danger); font-size: 18px;}
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+        body.is-exporting { align-items: flex-start !important; padding: 0 !important; background: white !important; }
+        body.is-exporting .action-bar, body.is-exporting .modal-overlay, body.is-exporting #toast-container { display: none !important; }
+        body.is-exporting #report-content { margin: 0 !important; box-shadow: none !important; position: absolute; top: 0; left: 0; border-radius: 0;}
+        @media print { .action-bar, .modal-overlay, #toast-container { display: none; } #report-content { box-shadow: none; width: 100%; padding: 0; } }
+    </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="action-bar">
+    <button class="btn" id="btn-prev" style="background: var(--primary);" onclick="prevStudent()"><i class="fa-solid fa-chevron-left"></i> Bài trước</button>
+    <button class="btn" id="btn-grade" style="background: var(--success);" onclick="openGradeModal()"><i class="fa-solid fa-pen-to-square"></i> Chấm điểm</button>
+    <button class="btn" id="btn-download" style="background: var(--primary);" onclick="exportPDF()"><i class="fa-solid fa-print"></i> Xuất Phiếu PDF</button>
+    <button class="btn" style="background: var(--danger);" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Trang Quản Trị</button>
+    <button class="btn" id="btn-next" style="background: var(--primary);" onclick="nextStudent()">Bài tiếp <i class="fa-solid fa-chevron-right"></i></button>
+</div>
+
+<div id="gradeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fa-solid fa-clipboard-check"></i> CHẤM ĐIỂM TỰ LUẬN</h2>
+            <button class="close-btn" onclick="closeGradeModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <table class="grading-table">
+                <thead><tr><th>Câu hỏi</th><th>Nội dung học sinh trình bày</th><th>Nhập Điểm</th></tr></thead>
+                <tbody id="grading-tbody"></tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" style="background: #94a3b8; color: white;" onclick="closeGradeModal()">Hủy Bỏ</button>
+            <button id="btn-save-grades" class="btn" style="background: var(--success);" onclick="saveEssayGrades()"><i class="fa-solid fa-floppy-disk"></i> Lưu Bảng Điểm</button>
+        </div>
+    </div>
+</div>
+
+<div id="report-content">
+    <div class="header-top">
+        <div class="header-left"><p>TRƯỜNG <span id="lbl-school">---</span></p><p>Tổ: Khoa học tự nhiên</p></div>
+        <div class="header-right"><p>ĐỀ KIỂM TRA ĐÁNH GIÁ</p><p>Năm học: <span id="lbl-year">2025 - 2026</span></p><p>Môn: <span id="lbl-subject">Tin học</span></p></div>
+    </div>
+    <div class="student-info">
+        <p>Họ và tên thí sinh: <span id="lbl-name" class="dynamic-data"></span></p>
+        <p>Lớp: <span id="lbl-class" class="dynamic-data"></span></p>
+        <p>Thời gian nộp bài: <span id="lbl-time" class="dynamic-data"></span></p>
+    </div>
+    <div class="report-title"><h1>PHIẾU BÀI LÀM CHI TIẾT</h1></div>
+
+    <table class="score-table">
+        <tr><th>Điểm Trắc nghiệm</th><th>Điểm Tự luận</th><th>Tổng điểm</th></tr>
+        <tr>
+            <td class="score-val" id="lbl-score-tn">0.00</td>
+            <td class="score-essay" id="lbl-score-tl"><i style="font-size: 12pt; color: #64748b; font-weight: normal;">(Chưa chấm)</i></td>
+            <td class="score-val" id="lbl-score-total">0.00</td>
+        </tr>
+    </table>
+
+    <div class="avoid-break">
+        <p class="section-title">I. PHẦN TRẮC NGHIỆM LỰA CHỌN</p>
+        <table id="tbl-mcq" class="data-table"></table>
+    </div>
+    <div class="avoid-break" style="margin-top: 15px;">
+        <p class="section-title">II. PHẦN TRẮC NGHIỆM ĐÚNG/SAI</p>
+        <table id="tbl-tf" class="data-table"></table>
+    </div>
+    <div id="section-essay" style="margin-top: 15px; display: block;">
+        <p class="section-title">III. PHẦN TỰ LUẬN</p>
+        <div id="box-essay"></div>
+    </div>
+</div>
+
+<script>
+    let filteredData = [];
+    let currentIndex = 0;
+    let currentScoreTN = 0.0; 
+    let currentStudentHsCode = "";
+    let parsedEssays = []; 
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if(!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-exclamation"></i>';
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 3000);
+    }
+
+    function safeScore(value) {
+        if (!value) return 0;
+        let parsed = parseFloat(String(value).replace(',', '.'));
+        return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function initReport() {
+        filteredData = JSON.parse(sessionStorage.getItem('admin_filtered_data') || "[]");
+        currentIndex = parseInt(sessionStorage.getItem('report_current_index') || "0");
+        
+        if (filteredData.length === 0) {
+            alert("Lỗi kết nối dữ liệu! Đang quay lại trang Admin...");
+            goHome();
+            return;
+        }
+
+        if (typeof CONFIG !== 'undefined' && CONFIG.SCHOOL_YEAR) {
+            document.getElementById('lbl-year').innerText = CONFIG.SCHOOL_YEAR;
+        }
+
+        loadStudentData();
+    }
+
+    function formatTime(val) {
+        if (!val) return "---";
+        let str = String(val);
+        if (str.includes('1899-') || str.includes('1900-') || str.includes('T')) {
+            try {
+                let d = new Date(str);
+                if(!isNaN(d.getTime())) {
+                    if (d.getFullYear() < 2000) return d.toLocaleTimeString('vi-VN', { hour12: false });
+                    return d.toLocaleTimeString('vi-VN', { hour12: false }) + " " + d.toLocaleDateString('vi-VN');
+                }
+            } catch(e) {}
+        }
+        return str; 
+    }
+
+    function loadStudentData() {
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnGrade = document.getElementById('btn-grade');
+        
+        btnPrev.disabled = (currentIndex === 0);
+        btnPrev.style.background = (currentIndex === 0) ? '#94a3b8' : 'var(--primary)';
+        
+        btnNext.disabled = (currentIndex === filteredData.length - 1);
+        btnNext.style.background = (currentIndex === filteredData.length - 1) ? '#94a3b8' : 'var(--primary)';
+
+        const student = filteredData[currentIndex];
+        
+        document.getElementById('lbl-name').innerText = String(student[3] || "N/A").toUpperCase();
+        document.getElementById('lbl-class').innerText = String(student[4] || "---");
+        document.getElementById('lbl-school').innerText = String(student[5] || "---").toUpperCase();
+        document.getElementById('lbl-time').innerText = formatTime(student[1] || student[0]);
+
+        let cls = String(student[4] || "");
+        document.getElementById('lbl-subject').innerText = cls.startsWith("6") ? "Tin học 6" : (cls.startsWith("7") ? "Tin học 7" : (cls.startsWith("8") ? "Tin học 8" : (cls.startsWith("9") ? "Tin học 9" : "Tin học")));
+
+        currentScoreTN = safeScore(student[8]) + safeScore(student[9]);
+        document.getElementById('lbl-score-tn').innerText = currentScoreTN.toFixed(2);
+        
+        let totalScore = safeScore(student[13]);
+        let oldScoreTL = totalScore - currentScoreTN;
+        if (oldScoreTL < 0) oldScoreTL = 0; 
+        
+        let status = String(student[10] || "").trim();
+        let isGraded = (status === "Đã chấm");
+
+        if(isGraded) {
+            document.getElementById('lbl-score-tl').innerText = oldScoreTL.toFixed(2);
+            document.getElementById('lbl-score-total').innerText = totalScore.toFixed(2);
+            
+            btnGrade.disabled = true;
+            btnGrade.innerHTML = '<i class="fa-solid fa-check"></i> Đã chấm';
+            btnGrade.style.background = '#b45309'; 
+        } else {
+            document.getElementById('lbl-score-tl').innerHTML = '<i style="font-size: 12pt; color: #64748b; font-weight: normal;">(Chưa chấm)</i>';
+            document.getElementById('lbl-score-total').innerText = currentScoreTN.toFixed(2);
+            
+            btnGrade.disabled = false;
+            btnGrade.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Chấm điểm';
+            btnGrade.style.background = 'var(--success)';
+        }
+
+        // =========================================================
+        // GIẢI MÃ TỰ LUẬN TỪ CỘT Q
+        // =========================================================
+        currentStudentHsCode = String(student[14] || "").replace(/^'/, "").trim();
+
+        let rawAnsCode = String(student[15] || "").replace(/^'/, "").trim();
+        let rawEssayCode = String(student[16] || "").replace(/^'/, "").trim();
+
+        if (!rawEssayCode && rawAnsCode.includes('*')) {
+            let parts = rawAnsCode.split('*');
+            if (parts.length >= 3) rawEssayCode = parts[parts.length - 1]; 
+        }
+
+        let mcqHtml = '<tr><td colspan="12" style="font-style:italic; color:#64748b; padding:15px;">Bài làm này không có trắc nghiệm.</td></tr>';
+        let tfHtml = '<tr><td colspan="5" style="font-style:italic; color:#64748b; padding:15px;">Bài làm này không có Đúng/Sai.</td></tr>';
+        
+        let ansParts = rawAnsCode.split('*');
+        
+        if (ansParts[0] && ansParts[0].includes('C1')) {
+            let items = ansParts[0].split('-');
+            mcqHtml = ""; let trQ = "", trA = "";
+            items.forEach((item, i) => {
+                let m = item.match(/C(\d+)([A-DX])/i);
+                if(m) {
+                    let q = m[1], a = m[2].toUpperCase()==='X'?'':m[2].toUpperCase();
+                    if (i > 0 && i % 15 === 0) { mcqHtml += trQ + "</tr>" + trA + "</tr>"; trQ = "<tr>"; trA = "<tr>"; }
+                    if (i % 15 === 0) { trQ = "<tr>"; trA = "<tr>"; }
+                    trQ += `<th>C.${q}</th>`; 
+                    trA += `<td><b style="color:var(--primary);">${a}</b></td>`; 
+                }
+            });
+            if (trQ !== "") mcqHtml += trQ + "</tr>" + trA + "</tr>";
+        }
+        
+        if (ansParts[1]) {
+            let tfMap = {};
+            ansParts[1].split('-').forEach(item => {
+                let m = item.match(/C(\d+)([a-d])([DSX])/i);
+                if(m) {
+                    let q = m[1], o = m[2].toLowerCase(), a = m[3].toUpperCase();
+                    if(!tfMap[q]) tfMap[q] = {a:'',b:'',c:'',d:''};
+                    tfMap[q][o] = a==='D'?'Đ':(a==='S'?'S':'');
+                }
+            });
+            tfHtml = "<tr><th>Câu</th><th>Ý a</th><th>Ý b</th><th>Ý c</th><th>Ý d</th></tr>";
+            for(let q in tfMap) {
+                tfHtml += `<tr><td><b>Câu ${q}</b></td><td><b style="color:var(--primary);">${tfMap[q].a}</b></td><td><b style="color:var(--primary);">${tfMap[q].b}</b></td><td><b style="color:var(--primary);">${tfMap[q].c}</b></td><td><b style="color:var(--primary);">${tfMap[q].d}</b></td></tr>`;
+            }
+        }
+
+        parsedEssays = [];
+        if (rawEssayCode) {
+            let essayItems = rawEssayCode.split('-');
+            essayItems.forEach(item => {
+                let m = item.match(/^C(\d+):(.*)$/i);
+                if(m) {
+                    let qNum = m[1];
+                    let encoded = m[2].trim();
+                    let content = "";
+                    if(encoded !== "X" && encoded !== "") {
+                        try { 
+                            if (/^[A-Za-z0-9+/=]+$/.test(encoded)) {
+                                content = decodeURIComponent(escape(atob(encoded))); 
+                            } else { content = encoded; }
+                        } catch(e) { content = encoded; }
+                    }
+                    if(!parsedEssays.find(e => e.qNum === qNum)) {
+                        parsedEssays.push({ qNum: qNum, ansText: content });
+                    }
+                } else {
+                    if (parsedEssays.length > 0) {
+                        parsedEssays[parsedEssays.length - 1].ansText += "-" + item;
+                    } else { parsedEssays.push({ qNum: "TL", ansText: item }); }
+                }
+            });
+        }
+
+        document.getElementById('tbl-mcq').innerHTML = mcqHtml;
+        document.getElementById('tbl-tf').innerHTML = tfHtml;
+
+        let essayHtml = "";
+        if (parsedEssays.length === 0) {
+            essayHtml = "<i>Bài làm này không chứa dữ liệu tự luận.</i>";
+        } else {
+            parsedEssays.forEach(item => {
+                let isBlank = (!item.ansText || item.ansText.trim() === "");
+                let safeHtml = isBlank ? "<i style='color:#e11d48;'>(Học sinh bỏ trống)</i>" : item.ansText;
+                essayHtml += `
+                <div class="essay-box avoid-break">
+                    <div class="essay-box-title" id="title-essay-${item.qNum}">
+                        <span>Trả lời câu ${item.qNum}:</span>
+                        <span class="essay-score-label hidden" id="score-label-${item.qNum}"></span>
+                    </div>
+                    <div class="essay-box-content">${safeHtml}</div>
+                </div>`;
+            });
+        }
+        document.getElementById('box-essay').innerHTML = essayHtml;
+        window.scrollTo(0, 0); 
+    }
+
+    function nextStudent() {
+        if (currentIndex < filteredData.length - 1) {
+            currentIndex++;
+            sessionStorage.setItem('report_current_index', currentIndex);
+            loadStudentData();
+        }
+    }
+
+    function prevStudent() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            sessionStorage.setItem('report_current_index', currentIndex);
+            loadStudentData();
+        }
+    }
+
+    function openGradeModal() {
+        let tbody = document.getElementById('grading-tbody');
+        tbody.innerHTML = "";
+        
+        if (parsedEssays.length === 0) {
+            tbody.innerHTML = `<tr><td>-</td><td><div class="essay-text-preview" style="color:var(--danger); font-style:italic;">Bài thi không có tự luận.</div></td><td><input type="number" class="grade-input" disabled></td></tr>`;
+        } else {
+            parsedEssays.forEach((item) => {
+                let isBlank = (!item.ansText || item.ansText.trim() === "");
+                let safeText = isBlank ? "<i style='color:var(--danger); font-style:italic;'>(Bỏ trống)</i>" : item.ansText;
+                
+                let existingLabel = document.getElementById('score-label-' + item.qNum);
+                let oldScore = (existingLabel && !existingLabel.classList.contains('hidden')) ? existingLabel.innerText.replace('Điểm: ', '').trim() : "";
+
+                let inputHtml = isBlank 
+                    ? `<input type="number" class="grade-input" data-qnum="${item.qNum}" value="0" disabled>`
+                    : `<input type="number" step="0.25" min="0" class="grade-input" data-qnum="${item.qNum}" placeholder="0.0" value="${oldScore}">`;
+
+                tbody.innerHTML += `<tr>
+                    <td>Câu ${item.qNum}</td>
+                    <td><div class="essay-text-preview">${safeText}</div></td>
+                    <td>${inputHtml}</td>
+                </tr>`;
+            });
+        }
+        document.getElementById('gradeModal').classList.add('active');
+    }
+
+    function closeGradeModal() { document.getElementById('gradeModal').classList.remove('active'); }
+
+    // =======================================================
+    // FIX LỖI TẠO DÒNG MỚI KHI LƯU ĐIỂM
+    // =======================================================
+    async function saveEssayGrades() {
+        let totalEssayScore = 0.0;
+        let inputs = document.querySelectorAll('.grade-input');
+        let hasError = false;
+
+        inputs.forEach(input => {
+            if(!input.disabled) {
+                let val = input.value.replace(',', '.');
+                if(val !== "") {
+                    let score = parseFloat(val);
+                    if(isNaN(score) || score < 0) { 
+                        showToast("Có lỗi ở ô nhập điểm! Vui lòng chỉ nhập số >= 0.", "error"); 
+                        hasError = true; return; 
+                    }
+                    totalEssayScore += score;
+
+                    let qNum = input.getAttribute('data-qnum');
+                    if (qNum !== "0" && qNum !== null) {
+                        let labelEl = document.getElementById('score-label-' + qNum);
+                        if (labelEl) { labelEl.innerText = `Điểm: ${score.toFixed(2)}`; labelEl.classList.remove('hidden'); }
+                    }
+                }
+            }
+        });
+
+        if (hasError) return;
+
+        let totalScore = currentScoreTN + totalEssayScore;
+        let btn = document.getElementById('btn-save-grades');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';
+        btn.disabled = true;
+
+        const student = filteredData[currentIndex];
+
+        // Mấu chốt 1: Lấy chính xác tọa độ dòng để Google Sheets ghi đè
+        let actualRowIndex = parseInt(student[student.length - 1]);
+        
+        if (isNaN(actualRowIndex) || actualRowIndex < 2) {
+            for (let i = student.length - 1; i >= 10; i--) {
+                let val = parseInt(student[i]);
+                if (!isNaN(val) && val >= 2 && val < 50000) { actualRowIndex = val; break; }
+            }
+        }
+
+        const payload = {
+            action: "updateScore",
+            rowIndex: actualRowIndex, 
+            hsCode: currentStudentHsCode,
+            scoreEssay: totalEssayScore,
+            totalScore: totalScore
+        };
+
+        try {
+            // Mấu chốt 2: Ép tham số ?action=updateScore vào URL để máy chủ không nhầm sang nộp bài (tạo dòng)
+            let fetchUrl = CONFIG.GOOGLE_SCRIPT_URL;
+            if (fetchUrl.includes('?')) { fetchUrl += '&action=updateScore'; } 
+            else { fetchUrl += '?action=updateScore'; }
+
+            const response = await fetch(fetchUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === "success") {
+                showToast("Đã lưu điểm tự luận thành công!");
+                
+                document.getElementById('lbl-score-tl').innerText = totalEssayScore.toFixed(2);
+                document.getElementById('lbl-score-total').innerText = totalScore.toFixed(2);
+                
+                filteredData[currentIndex][10] = "Đã chấm"; 
+                filteredData[currentIndex][11] = totalEssayScore; 
+                filteredData[currentIndex][13] = totalScore; 
+                sessionStorage.setItem('admin_filtered_data', JSON.stringify(filteredData));
+
+                const btnGrade = document.getElementById('btn-grade');
+                btnGrade.disabled = true;
+                btnGrade.innerHTML = '<i class="fa-solid fa-check-double"></i> Đã chấm';
+                btnGrade.style.background = '#b45309';
+
+                closeGradeModal();
+            } else {
+                showToast("Lỗi từ máy chủ: " + result.message, "error");
+            }
+        } catch (e) {
+            showToast("Lỗi mạng: Không thể lưu điểm lên hệ thống!", "error");
+        } finally {
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Lưu Bảng Điểm';
+            btn.disabled = false;
+        }
+    }
+
+    function exportPDF() {
+        const btn = document.getElementById('btn-download');
+        const element = document.getElementById('report-content');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang xử lý...';
+        btn.disabled = true;
+        window.scrollTo(0, 0); document.body.classList.add('is-exporting');
+
+        setTimeout(() => {
+            let className = String(filteredData[currentIndex][4] || "").replace('/', '-');
+            let studentName = String(filteredData[currentIndex][3] || "");
+            
+            html2pdf().set({
+                margin: 0, filename: `Phieu_Bao_Cao_${className}_${studentName}.pdf`, 
+                image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0, windowWidth: 794 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save().then(() => {
+                document.body.classList.remove('is-exporting');
+                btn.innerHTML = '<i class="fa-solid fa-print"></i> Xuất Phiếu PDF'; btn.disabled = false;
+            }).catch(err => { document.body.classList.remove('is-exporting'); btn.disabled = false; });
+        }, 500);
+    }
+
+    function goHome() { window.location.href = "admin.html"; }
+
+    window.onload = initReport;
+</script>
+</body>
+</html>
