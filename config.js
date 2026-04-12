@@ -23,9 +23,9 @@ const CONFIG = {
             name: "THCS Nguyễn Du",
             scriptUrl: "https://script.google.com/macros/s/AKfycbwRCeo9OnJ46SiibwMqkLwiHrFww3r94yskXV2NIBTGvVkRqZKHdf3UoKOQg5-tcX13mA/exec"
         },
-        "thai_son": {
-            name: "THCS Thái Sơn",
-            scriptUrl: "https://script.google.com/macros/s/AKfycbwRCeo9OnJ46SiibwMqkLwiHrFww3r94yskXV2NIBTGvVkRqZKHdf3UoKOQg5-tcX13mA/exec"
+        "thcs_tomau": {
+            name: "TH&THCS Tô Mậu",
+            scriptUrl: "https://script.google.com/macros/s/AKfycbzxeaGF2LTTJVfPHOSaBjNgILuUqUWJabUNGjbFhc_u80a1O1gTlZKUgdbjS8I9i4NN/exec"
         }
         // Có thể copy thêm các trường khác vào đây, nhớ thêm dấu phẩy ở cuối block trên
     }
