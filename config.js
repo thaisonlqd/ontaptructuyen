@@ -19,10 +19,6 @@ const CONFIG = {
             name: "THCS Lê Quý Đôn",
             scriptUrl: "https://script.google.com/macros/s/AKfycbxImktN_8RZ_9So_rapGU5i7q5cyKypWfH8MRF0K0wabN0F3pGE1m8iYEn0LLUm4Qfk/exec"
         },
-        "nguyen_du": {
-            name: "THCS Nguyễn Du",
-            scriptUrl: "https://script.google.com/macros/s/AKfycbwRCeo9OnJ46SiibwMqkLwiHrFww3r94yskXV2NIBTGvVkRqZKHdf3UoKOQg5-tcX13mA/exec"
-        },
         "thcs_tomau": {
             name: "TH&THCS Tô Mậu",
             scriptUrl: "https://script.google.com/macros/s/AKfycbzxeaGF2LTTJVfPHOSaBjNgILuUqUWJabUNGjbFhc_u80a1O1gTlZKUgdbjS8I9i4NN/exec"
